@@ -1,0 +1,5 @@
+# Exclure tous les fichiers objets
+*.o
+
+# Exclure également les fichiers objets dans les sous-dossiers
+**/*.o
