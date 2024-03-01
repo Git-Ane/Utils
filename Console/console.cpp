@@ -7,32 +7,47 @@ using namespace std;
 namespace GitAne{
     class Command{
         public:
-            Command(string nom,void (*fonc) (void),string helpmess){
+            Command(string nom,void (*fonc) (vector<string>),string helpmess, unsigned int nbm, unsigned int nbM){
                 name = nom;
                 fonction = fonc;
                 helpMessage = helpmess;
+                nbminargs = nbm;
+                nbmaxargs = nbM;
             }
 
             string getName(){
                 return name;
             }
 
-            bool compatible(string nom){
-                return (nom==name);
+            bool compatible(string nom,unsigned int nbarg){
+                return (nom==name && nbarg >= nbminargs && nbarg <= nbmaxargs);
             }
 
-            void execute(){
-                fonction();
+            void execute(vector<string> argvect){
+                fonction(argvect);
             }
 
             void print(){
-                cout << name << " -> " << helpMessage << endl;
+                cout << name;
+                unsigned int i=0;
+                for(i=0;i<nbmaxargs;i++){
+                    cout << " ";
+                    if(i>nbminargs){cout << "?";}
+                    cout << "arg" << i+1;
+                }
+                cout << " -> " << helpMessage << endl;
+            }
+
+            unsigned int getNbMinArg(){
+                return nbminargs;
             }
 
         private:
             string name;
-            void (*fonction) (void);
+            void (*fonction) (vector<string>);
             string helpMessage;
+            unsigned int nbminargs;
+            unsigned int nbmaxargs;
     };
 
 }
@@ -41,19 +56,27 @@ using namespace GitAne;
 
 vector<Command> commandesvect;
 
-void addCommand(string name, void (*fonc) (void),string helpmess){
-    commandesvect.push_back(Command(name,fonc,helpmess));
+void addCommand(string name, void (*fonc) (vector<string>),string helpmess, unsigned int nbminarg, unsigned int nbmaxarg){
+    commandesvect.push_back(Command(name,fonc,helpmess,nbminarg,nbmaxarg));
 }
 
 
-void sayHello(){
-    cout << "Hi from the Gitane Team !\n";
+void sayHello(vector<string> _){
+    cout << "Hi from the Gitane Team !" << endl;
+}
+
+void concatenate(vector<string> words){
+    if(words.size()==2){cout << words[0] << words[1] << endl;}
+    else{cout << words[0]<<endl;}
 }
 
 
 int main(int argc, char* argv[]) {
 
-    addCommand("hello",&sayHello,"says hello :)"); 
+    unsigned int uargc = argc;
+
+    addCommand("hello",&sayHello,"says hello :)",0,0); 
+    addCommand("concatenate",&concatenate,"concatenates arg1 and arg2 (returns arg1 if only 1 argument)",1,2); 
 
     unsigned int i; 
 
@@ -71,7 +94,7 @@ int main(int argc, char* argv[]) {
             }
             else{
                 for(i=0;i<commandesvect.size();i++){
-                    if(commandesvect[i].compatible(argv[2])){
+                    if(commandesvect[i].compatible(argv[2],commandesvect[i].getNbMinArg())){
                         commandesvect[i].print();
                         break;
                     }
@@ -84,9 +107,15 @@ int main(int argc, char* argv[]) {
         }
         else{
 
+            vector<string> argvect;
+
+            for(i=2;i<uargc;i++){
+                argvect.push_back(string(argv[i]));
+            }
+
             for(i=0;i<commandesvect.size();i++){
-                if(commandesvect[i].compatible(argv[1])){
-                    commandesvect[i].execute();
+                if(commandesvect[i].compatible(argv[1],uargc-2)){
+                    commandesvect[i].execute(argvect);
                     break;
                 }
             }
