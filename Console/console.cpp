@@ -135,7 +135,7 @@ int main(int argc, char* argv[]) {
                 }
                 if(i==commandesvect.size()){
                         cout << argv[2] <<" is not a valid gitane command" << endl;
-                        cout << "Type gitane to see a list of commands" << endl;
+                        cout << "Type gitane (or gac for short) to see a list of commands" << endl;
                 }
             }
         }
