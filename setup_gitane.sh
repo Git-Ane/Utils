@@ -6,6 +6,7 @@ PROGRAM_PATH="/home/nathan/Git-Ane/Utils/Console/build/GitAneConsole"
 
 # Desired command name
 COMMAND_NAME="gitane"
+COMMAND_NAME2="gac"
 
 # Directory where symbolic link will be created
 BIN_DIRECTORY="/usr/local/bin"
@@ -18,6 +19,12 @@ fi
 
 # Create symbolic link
 if ln -s "$PROGRAM_PATH" "$BIN_DIRECTORY/$COMMAND_NAME"; then
+    echo "Symbolic link created successfully"
+else
+    echo "Error: Failed to create symbolic link"
+fi
+
+if ln -s "$PROGRAM_PATH" "$BIN_DIRECTORY/$COMMAND_NAME2"; then
     echo "Symbolic link created successfully"
 else
     echo "Error: Failed to create symbolic link"
