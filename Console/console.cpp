@@ -5,6 +5,8 @@ using namespace std;
 #include <vector>
 
 namespace GitAne{
+    /*! \brief A Command callable in the terminal
+    */
     class Command{
         public:
             Command(string nom,void (*fonc) (vector<string>),string helpmess, unsigned int nbm, unsigned int nbM){
@@ -15,18 +17,27 @@ namespace GitAne{
                 nbmaxargs = nbM;
             }
 
+
+            /*! \brief Get Command name
+            */
             string getName(){
                 return name;
             }
 
+            /*! \brief Is function compatible with name + number of arguments
+            */
             bool compatible(string nom,unsigned int nbarg){
                 return (nom==name && nbarg >= nbminargs && nbarg <= nbmaxargs);
             }
 
+            /*! \brief execute Command
+            */
             void execute(vector<string> argvect){
                 fonction(argvect);
             }
 
+            /*! \brief Print information about command
+            */
             void print(){
                 cout << name;
                 unsigned int i=0;
@@ -38,6 +49,8 @@ namespace GitAne{
                 cout << " -> " << helpMessage << endl;
             }
 
+            /*! \brief Get minimal number of arguments of Command
+            */
             unsigned int getNbMinArg(){
                 return nbminargs;
             }
@@ -50,15 +63,36 @@ namespace GitAne{
             unsigned int nbmaxargs;
     };
 
+    using namespace GitAne;
+
+    namespace Console{
+
+        /*! \brief The command list
+        */
+        vector<Command> commandesvect;
+
+
+
+        /*! \brief Add a Command to Command list
+        \param name the name of the command
+        \param fonc the fonc to execute when command is called
+        \param helpmess the help message
+        \param nbminarg minimum number of arguments
+        \param nbmaxarg maximum number of arguments
+        */
+        void addCommand(string name, void (*fonc) (vector<string>),string helpmess, unsigned int nbminarg, unsigned int nbmaxarg){
+            commandesvect.push_back(Command(name,fonc,helpmess,nbminarg,nbmaxarg));
+
+    }
+}
+
 }
 
 using namespace GitAne;
 
-vector<Command> commandesvect;
+using namespace Console;
 
-void addCommand(string name, void (*fonc) (vector<string>),string helpmess, unsigned int nbminarg, unsigned int nbmaxarg){
-    commandesvect.push_back(Command(name,fonc,helpmess,nbminarg,nbmaxarg));
-}
+
 
 
 void sayHello(vector<string> _){
