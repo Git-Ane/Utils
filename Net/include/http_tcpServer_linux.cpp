@@ -27,7 +27,8 @@ namespace GitAne::Net
             std::cout << "ERREUR: Impossible de créer une socket";
             return 1;
         }
-        if(bind(id_socket,(sockaddr *)&sockAddr,sizeof(sockAddr)) < 0){
+        sockAddr_len = sizeof(sockAddr);
+        if(bind(id_socket,(sockaddr *)&sockAddr,sockAddr_len) < 0){
             std::cout << "ERREUR: Impossible de connecter le socket à l'addresse " << domain;
             return 1;
         }
@@ -53,12 +54,22 @@ namespace GitAne::Net
 
     }
 
-    void TcpServer::acceptConnection(http::Socket &new_socket){
-
+    void TcpServer::acceptConnection(int& new_socket){
+        new_socket = accept(id_socket, (sockaddr *)&sockAddr,(socklen_t *)&sockAddr_len);
+        if(new_socket < 0) {
+            std::ostringstream ss;
+            ss << 
+            "Server failed to accept incoming connection from ADDRESS: " 
+            << inet_ntoa(sockAddr.sin_addr) << "; PORT: " 
+            << ntohs(sockAddr.sin_port);
+            std::cout << (ss.str());
+            return;
+        }
     }
 
     int TcpServer::stop(){
         close(id_socket);
+        close(new_socket);
         return 0;
     }
 

@@ -16,10 +16,12 @@ namespace GitAne::Net
         int max_curr_conn; // If |users| >= max_curr_conn, all connections refused
         void startListening();
         void stopListening();
-        void acceptConnection(http::Socket &new_socket);
+        void acceptConnection(int& new_socket);
     
     private:
         int id_socket;
+        int new_socket;
+        int sockAddr_len;
         int port;
         struct sockaddr_in sockAddr;
         std::string domain;
