@@ -75,7 +75,7 @@ namespace GitAne{
 
         /*! \brief Add a Command to Command list
         \param name the name of the command
-        \param fonc the fonc to execute when command is called
+        \param fonc the function to execute when command is called
         \param helpmess the help message
         \param nbminarg minimum number of arguments
         \param nbmaxarg maximum number of arguments
@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) {
             }
             if(i==commandesvect.size()){
                     cout << "This is not a valid gitane command" << endl;
-                    cout << "Type gitane to see a list of commands" << endl;
+                    cout << "Type gitane (or gac for short) to see a list of commands" << endl;
             }
         }
     }
