@@ -9,7 +9,14 @@ COMMAND_NAME="gitane"
 COMMAND_NAME2="gac"
 
 # Directory where symbolic link will be created
-BIN_DIRECTORY="/usr/local/bin"
+
+echo "Enter your bin directory"
+echo "You can get it by typing echo \$PATH in your terminal"
+echo "If you are on ubuntu, then /usr/local/bin works"
+
+read -p "Enter your bin directory: " BIN_DIRECTORY
+
+
 
 # Check if the program path exists
 if [ ! -f "$PROGRAM_PATH" ]; then
