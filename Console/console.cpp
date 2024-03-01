@@ -32,7 +32,7 @@ namespace GitAne{
                 unsigned int i=0;
                 for(i=0;i<nbmaxargs;i++){
                     cout << " ";
-                    if(i>nbminargs){cout << "?";}
+                    if(i>=nbminargs){cout << "?";}
                     cout << "arg" << i+1;
                 }
                 cout << " -> " << helpMessage << endl;
