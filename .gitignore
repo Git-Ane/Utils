@@ -3,3 +3,8 @@
 
 # Exclure également les fichiers objets dans les sous-dossiers
 **/*.o
+
+#Exclure les fichiers de config perso
+.vscode/settings.json
+.vscode/c_cpp_properties.json
+Console/build
