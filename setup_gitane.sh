@@ -2,7 +2,7 @@
 #!/bin/bash
 
 # Path to your program
-PROGRAM_PATH="./Console/build/GitAneConsole"
+PROGRAM_PATH="$(pwd)/Console/build/GitAneConsole"
 
 # Desired command name
 COMMAND_NAME="gitane"
