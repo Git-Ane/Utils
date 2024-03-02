@@ -9,8 +9,9 @@ namespace GitAne{
     /*! \brief A Command callable in the terminal
     */
     
-            Command::Command(string nom,void (*fonc) (vector<string>),string helpmess, unsigned int nbm, unsigned int nbM){
+            Command::Command(string nom, string plugin_name,void (*fonc) (vector<string>),string helpmess, unsigned int nbm, unsigned int nbM){
                 name = nom;
+                plugin = plugin_name;
                 fonction = fonc;
                 helpMessage = helpmess;
                 nbminargs = nbm;
@@ -39,7 +40,7 @@ namespace GitAne{
             /*! \brief Print information about command
             */
             void Command::print(){
-                cout << name;
+                cout << plugin << " " << name;
                 unsigned int i=0;
                 for(i=0;i<nbmaxargs;i++){
                     cout << " ";
@@ -63,6 +64,7 @@ namespace GitAne{
         /*! \brief The command list
         */
         vector<Command*> commandesvect;
+        string active_plugin_name = "";
 
 
 
@@ -72,10 +74,17 @@ namespace GitAne{
         \param helpmess the help message
         \param nbminarg minimum number of arguments
         \param nbmaxarg maximum number of arguments
+        \param nbmaxarg maximum number of arguments
         */
         void addCommand(string name, void (*fonc) (vector<string>),string helpmess, unsigned int nbminarg, unsigned int nbmaxarg){
-             commandesvect.push_back(new Command(name,fonc,helpmess,nbminarg,nbmaxarg));
+             commandesvect.push_back(new Command(name,active_plugin_name,fonc,helpmess,nbminarg,nbmaxarg));
+        }
 
+        /*! \brief Call first when loading a plugin
+        \param plugin_name the name of the plugin
+        */
+        void initPlugin(string plugin_name){
+            active_plugin_name = plugin_name;
+        }
     }
-}
 }

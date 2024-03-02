@@ -13,12 +13,13 @@ namespace GitAne{
     {
     private:
         string name;
+        string plugin;
         void (*fonction) (vector<string>);
         string helpMessage;
         unsigned int nbminargs;
         unsigned int nbmaxargs;
     public:
-        Command(string nom,void (*fonc) (vector<string>),string helpmess, unsigned int nbm, unsigned int nbM);
+        Command(string nom,string plugin_name,void (*fonc) (vector<string>),string helpmess, unsigned int nbm, unsigned int nbM);
 
         /*! \brief Get Command name
             */
@@ -47,6 +48,7 @@ namespace GitAne{
         /*! \brief The command list
         */
         extern vector<Command*> commandesvect;
+        extern string active_plugin_name;
 
         /*! \brief Add a Command to Command list
         \param name the name of the command
@@ -56,6 +58,8 @@ namespace GitAne{
         \param nbmaxarg maximum number of arguments
         */
         void addCommand(string name, void (*fonc) (vector<string>),string helpmess, unsigned int nbminarg, unsigned int nbmaxarg);
+
+        void initPlugin(string plugin_name);
     
     }
     

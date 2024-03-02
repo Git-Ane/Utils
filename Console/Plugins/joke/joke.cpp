@@ -14,6 +14,7 @@ namespace GitAne{
 
 
         void joke_plugin_loader(){
+            initPlugin("joke");
             addCommand("jonathan",&jonhatan,"A joke about Jonathan",0,0);
         }
     }
