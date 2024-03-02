@@ -3,28 +3,46 @@
 #include "HTTPRequest.hpp"
 #include "iostream"
 #include <netinet/in.h>
+#include <string>
 #include <sys/socket.h>
+#include "url_tree.hpp"
 #include <arpa/inet.h> // inet passe d'un char* à un int
 namespace GitAne::Net
-{    class TcpServer
-    {
-    public:
-        TcpServer(std::string domain, int port);
-        ~TcpServer();
-        int start();
-        int stop();
-        int max_curr_conn; // If |users| >= max_curr_conn, all connections refused
-        void startListening();
-        void stopListening();
-        void acceptConnection(int& new_socket);
+{    
     
+    class TcpServer
+    {
+    /* Primitives obligatoires */
+        public:
+            TcpServer(std::string domain, int port);
+            ~TcpServer();
+            int start();
+            int stop();
+            int max_curr_conn; // If |users| >= max_curr_conn, all connections refused
+            void startListening(); // lance la boucle du serveur
+            void stopListening(); // l'arrête
+            void acceptConnection(int& new_socket);
+            
+        
+        private:
+            int id_socket;
+            int new_socket; // quand quelqu'un rejoint on s'en sert pour stocker
+            int sockAddr_len;
+            int port;
+            struct sockaddr_in sockAddr; // stocke le port, l'ip, le protocole,...
+            const int BUFFER_SIZE;
+            std::string domain;
+            std::string serverMessage; // C'est ce que le serveur renvoie sur la page HTML, sera modifiée.
+            void sendResponse(std::string msg);
+
+    
+
+    /* Gestion des Plug-ins */
     private:
-        int id_socket;
-        int new_socket;
-        int sockAddr_len;
-        int port;
-        struct sockaddr_in sockAddr;
-        std::string domain;
+        UrlTree urlTree;
+
+
+
 
     };
 }
