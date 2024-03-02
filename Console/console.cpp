@@ -3,90 +3,9 @@ using namespace std;
 #include<iostream>
 #include<string>
 #include <vector>
-
-namespace GitAne{
-    /*! \brief A Command callable in the terminal
-    */
-    class Command{
-        public:
-            Command(string nom,void (*fonc) (vector<string>),string helpmess, unsigned int nbm, unsigned int nbM){
-                name = nom;
-                fonction = fonc;
-                helpMessage = helpmess;
-                nbminargs = nbm;
-                nbmaxargs = nbM;
-            }
+#include "commands.hpp"
 
 
-            /*! \brief Get Command name
-            */
-            string getName(){
-                return name;
-            }
-
-            /*! \brief Is function compatible with name + number of arguments
-            */
-            bool compatible(string nom,unsigned int nbarg){
-                return (nom==name && nbarg >= nbminargs && nbarg <= nbmaxargs);
-            }
-
-            /*! \brief execute Command
-            */
-            void execute(vector<string> argvect){
-                fonction(argvect);
-            }
-
-            /*! \brief Print information about command
-            */
-            void print(){
-                cout << name;
-                unsigned int i=0;
-                for(i=0;i<nbmaxargs;i++){
-                    cout << " ";
-                    if(i>=nbminargs){cout << "?";}
-                    cout << "arg" << i+1;
-                }
-                cout << " -> " << helpMessage << endl;
-            }
-
-            /*! \brief Get minimal number of arguments of Command
-            */
-            unsigned int getNbMinArg(){
-                return nbminargs;
-            }
-
-        private:
-            string name;
-            void (*fonction) (vector<string>);
-            string helpMessage;
-            unsigned int nbminargs;
-            unsigned int nbmaxargs;
-    };
-
-    using namespace GitAne;
-
-    namespace Console{
-
-        /*! \brief The command list
-        */
-        vector<Command> commandesvect;
-
-
-
-        /*! \brief Add a Command to Command list
-        \param name the name of the command
-        \param fonc the function to execute when command is called
-        \param helpmess the help message
-        \param nbminarg minimum number of arguments
-        \param nbmaxarg maximum number of arguments
-        */
-        void addCommand(string name, void (*fonc) (vector<string>),string helpmess, unsigned int nbminarg, unsigned int nbmaxarg){
-            commandesvect.push_back(Command(name,fonc,helpmess,nbminarg,nbmaxarg));
-
-    }
-}
-
-}
 
 using namespace GitAne;
 
@@ -109,6 +28,7 @@ int main(int argc, char* argv[]) {
 
     unsigned int uargc = argc;
 
+
     addCommand("hello",&sayHello,"says hello :)",0,0); 
     addCommand("concatenate",&concatenate,"concatenates arg1 and arg2 (returns arg1 if only 1 argument)",1,2); 
 
@@ -118,7 +38,7 @@ int main(int argc, char* argv[]) {
         cout << "Welcome to Gitane !" << endl;
         cout << "Here is a list of commands you can use :" << endl;
         for(i=0;i<commandesvect.size();i++){
-            commandesvect[i].print();
+            (*commandesvect[i]).print();
         }
     }
     else{
@@ -128,8 +48,8 @@ int main(int argc, char* argv[]) {
             }
             else{
                 for(i=0;i<commandesvect.size();i++){
-                    if(commandesvect[i].compatible(argv[2],commandesvect[i].getNbMinArg())){
-                        commandesvect[i].print();
+                    if((*commandesvect[i]).compatible(argv[2],(*commandesvect[i]).getNbMinArg())){
+                        (*commandesvect[i]).print();
                         break;
                     }
                 }
@@ -148,8 +68,8 @@ int main(int argc, char* argv[]) {
             }
 
             for(i=0;i<commandesvect.size();i++){
-                if(commandesvect[i].compatible(argv[1],uargc-2)){
-                    commandesvect[i].execute(argvect);
+                if((*commandesvect[i]).compatible(argv[1],uargc-2)){
+                    (*commandesvect[i]).execute(argvect);
                     break;
                 }
             }

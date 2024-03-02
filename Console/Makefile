@@ -8,7 +8,7 @@ CFLAGS=-std=c++14 -Wall -Iinclude
 TARGET=build/GitAneConsole
 
 # Chemins des fichiers source
-SRC=console.cpp
+SRC=console.cpp commands.cpp
 
 # Chemins des fichiers objet (dans le dossier build)
 OBJ=$(SRC:%.cpp=build/%.o)
