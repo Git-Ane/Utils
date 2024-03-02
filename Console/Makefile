@@ -8,7 +8,7 @@ CFLAGS=-std=c++14 -Wall -Iinclude
 TARGET=build/GitAneConsole
 
 # Chemins des fichiers source
-SRC=console.cpp commands.cpp
+SRC=console.cpp commands.cpp Plugins/plugin_loader.cpp Plugins/joke/joke.cpp
 
 # Chemins des fichiers objet (dans le dossier build)
 OBJ=$(SRC:%.cpp=build/%.o)
@@ -16,6 +16,8 @@ OBJ=$(SRC:%.cpp=build/%.o)
 # Création du répertoire build si nécessaire
 $(shell mkdir -p build)
 $(shell mkdir -p build/include)
+$(shell mkdir -p build/Plugins)
+$(shell mkdir -p build/Plugins/joke)
 
 all: $(TARGET)
 

@@ -3,7 +3,8 @@ using namespace std;
 #include<iostream>
 #include<string>
 #include <vector>
-#include "commands.hpp"
+
+#include "../Plugins/plugin_loader.hpp"
 
 
 
@@ -31,6 +32,8 @@ int main(int argc, char* argv[]) {
 
     addCommand("hello",&sayHello,"says hello :)",0,0); 
     addCommand("concatenate",&concatenate,"concatenates arg1 and arg2 (returns arg1 if only 1 argument)",1,2); 
+
+    plugin_loader();
 
     unsigned int i; 
 
