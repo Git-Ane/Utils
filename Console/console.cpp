@@ -6,7 +6,28 @@ using namespace std;
 
 #include "Plugins/plugin_loader.hpp"
 
-
+#include <ostream>
+namespace Color {
+    enum Code {
+        FG_RED      = 31,
+        FG_GREEN    = 32,
+        FG_BLUE     = 34,
+        FG_DEFAULT  = 39,
+        BG_RED      = 41,
+        BG_GREEN    = 42,
+        BG_BLUE     = 44,
+        BG_DEFAULT  = 49
+    };
+    class Modifier {
+        Code code;
+    public:
+        Modifier(Code pCode) : code(pCode) {}
+        friend std::ostream&
+        operator<<(std::ostream& os, const Modifier& mod) {
+            return os << "\033[" << mod.code << "m";
+        }
+    };
+}
 
 using namespace GitAne;
 
@@ -34,6 +55,9 @@ namespace GitAne{
 int main(int argc, char* argv[]) {
 
     unsigned int uargc = argc;
+
+    Color::Modifier red(Color::FG_RED);
+    Color::Modifier def(Color::FG_DEFAULT);
 
     initPlugin("std");
     addCommand("help",&std_helpmsg,"Help message about std plugin",0,0);
@@ -64,7 +88,7 @@ int main(int argc, char* argv[]) {
                     }
                 }
                 if(i==commandesvect.size()){
-                        cout << argv[2] << " " << argv[3] <<" is not a valid gitane command" << endl;
+                        cout << red << argv[2] << " " << argv[3] <<" is not a valid gitane command" << def << endl;
                         cout << "Type gitane (or gac for short) to see a list of commands" << endl;
                 }
             }
@@ -76,12 +100,12 @@ int main(int argc, char* argv[]) {
                     }
                 }
                 if(i==commandesvect.size()){
-                        cout << "Plugin "<< argv[2] << " is not imported or doesn't have an help command" << endl;
+                        cout << red << "Plugin "<< argv[2] << " is not imported or doesn't have an help command" << def << endl;
                         cout << "Type gitane (or gac for short) to see a list of commands" << endl;
                 }
             }
             else{
-                cout << "Too many arguments for help" <<endl;
+                cout << red << "Too many arguments for help" << def <<endl;
             }
         }
         else{
@@ -101,7 +125,7 @@ int main(int argc, char* argv[]) {
                     
                 }
                 if(i==commandesvect.size()){
-                    cout << "Plugin "<< argv[1] << " is not imported or doesn't have an help command" << endl;
+                    cout << red << "Plugin "<< argv[1] << " is not imported or doesn't have an help command" << def << endl;
                     cout << "Type gitane (or gac for short) to see a list of commands" << endl;
                 }
             }
@@ -114,7 +138,7 @@ int main(int argc, char* argv[]) {
                     }
                 }
                 if(i==commandesvect.size()){
-                        cout << "This is not a valid gitane command" << endl;
+                        cout << red << "This is not a valid gitane command" << def << endl;
                         cout << "Type gitane (or gac for short) to see a list of commands" << endl;
                 }
             }
