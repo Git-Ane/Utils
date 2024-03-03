@@ -27,7 +27,7 @@ namespace GitAne{
 
         /*! \brief Is function compatible with name + number of arguments
             */
-        bool compatible(string nom,unsigned int nbarg);
+        bool compatible(string nom, string nomplugin,unsigned int nbarg);
 
         /*! \brief execute Command
             */

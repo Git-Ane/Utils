@@ -27,8 +27,8 @@ namespace GitAne{
 
             /*! \brief Is function compatible with name + number of arguments
             */
-            bool Command::compatible(string nom,unsigned int nbarg){
-                return (nom==name && nbarg >= nbminargs && nbarg <= nbmaxargs);
+            bool Command::compatible(string nom,string nomplugin ,unsigned int nbarg){
+                return (nom==name && nbarg >= nbminargs && nbarg <= nbmaxargs && nomplugin==plugin);
             }
 
             /*! \brief execute Command
