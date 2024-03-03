@@ -1,3 +1,7 @@
+#ifndef COMMANDS_HPP
+#define COMMANDS_HPP
+
+
 using namespace std;
 
 #include<iostream>
@@ -71,3 +75,5 @@ namespace GitAne{
     }
     
 }
+
+#endif

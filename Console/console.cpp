@@ -83,6 +83,7 @@ int main(int argc, char* argv[]) {
 
     initPlugin("std");
     addCommand("help",&std_helpmsg,"Help message about std plugin",0,0);
+    addCommand("include_plugins",&generate_include_file,"include the plugins written in arg1 (default config.txt), must be in Plugins folder to launch this command",0,1); 
     addCommand("hello",&sayHello,"says hello :)",0,0); 
     addCommand("concatenate",&concatenate,"concatenates arg1 and arg2 (returns arg1 if only 1 argument)",1,2); 
 
