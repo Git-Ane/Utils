@@ -4,9 +4,10 @@
 #include "url_tree.hpp"
 #include <cstddef>
 #include <cstring>
+#include <fstream>
 #include <functional>
 #include <sstream>
-
+#include "json.hpp"
 
 /*
 
@@ -17,10 +18,11 @@ Still in work. Only support redirection & URL tree yet. Missing:
 - Database for register/login
 - Everything related to 
 */
-
+using json = nlohmann::json;
 namespace GitAne::Net
 {    
 
+    // UTILITAIRES 
     std::string extractGitParams(const std::string& input) {
         /*
         * Extrait les paramètres d'une requête
@@ -35,6 +37,24 @@ namespace GitAne::Net
         }
         return ""; 
     }
+    std::map<std::string, std::string> parseQueryString(const std::string& queryString) {
+        std::map<std::string, std::string> result;
+        std::istringstream iss(queryString);
+
+        std::string token;
+        while (std::getline(iss, token, '&')) {
+            size_t pos = token.find('=');
+            if (pos != std::string::npos) {
+                std::string key = token.substr(0, pos);
+                std::string value = token.substr(pos + 1);
+                result[key] = value;
+            }
+        }
+
+        return result;
+    }
+
+    // Default Builds
 
     std::string buildDefaultResponse(std::string method, std::string args){
         /*
@@ -68,13 +88,34 @@ namespace GitAne::Net
         Default print for the API, accessible using only your domain name.
         It (will) print to you all the availables URLs & descriptors (according to the plug-ins).
         */
-        std::string htmlFile = "<!DOCTYPE html><html lang=\"en\"><body><h1>GitÂne - Register </h1><p>Debug only for now.</p></body></html>";
+        
+        auto maps= parseQueryString(args);
+        bool contiens_name = maps.find("name") != maps.end();
+        bool contiens_pwd = maps.find("pwd") != maps.end();
+        if(!contiens_name || !contiens_pwd){
+            std::string htmlFile = "<!DOCTYPE html><html lang=\"en\"><body><h1>GitÂne - Register </h1><p>Missing arguments. Need name & pwd.</p></body></html>";
+            std::ostringstream ss;
+            ss << "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: " << htmlFile.size() << "\n\n"
+            << htmlFile;
+            std::string s = ss.str();
+            return s;
+        }
+        std::string username= maps["name"];
+        std::string pwd = maps["pwd"];
+        std::string htmlFile = "<!DOCTYPE html><html lang=\"en\"><body><h1>GitÂne - Register </h1><p>" + username + " "+ pwd + "</p></body></html>";
         std::ostringstream ss;
         ss << "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: " << htmlFile.size() << "\n\n"
-           << htmlFile;
-
+        << htmlFile;
         std::string s = ss.str();
+
+        std::ifstream f("./bdd/users.json");
+        json data = json::parse(f);
+        /*
+        TODO
+        */
         return s;
+        
+
     }
     std::string buildRegister2Response(std::string method, std::string args){
         /*
