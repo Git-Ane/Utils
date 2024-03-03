@@ -91,7 +91,7 @@ namespace GitAne::Net
     }
     /* PRIMITIVES */
     TcpServer::TcpServer(std::string d, int p):
-        domain(d), port(p), max_curr_conn(100), BUFFER_SIZE(30720),
+        max_curr_conn(100),id_socket(),new_socket(),sockAddr_len(),port(p),sockAddr(),BUFFER_SIZE(30720),domain(d),
         serverMessage(buildDefaultResponse("",""))
     {
 
@@ -231,7 +231,7 @@ namespace GitAne::Net
         long bytesSent;
         bytesSent = write(new_socket, msg.c_str(), msg.size());
 
-        if (bytesSent == msg.size())
+        if ((long unsigned int)bytesSent == msg.size())
         {
             std::cout << ("------ Server Response sent to client ------\n\n");
         }
