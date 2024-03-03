@@ -15,8 +15,8 @@ class NetClient {
             
             // Demander au serveur de se connecter avec les informations données
             // En pratique il faudra demander une clé publique au serveur avant d'envoyer le MDP
-            http::Request request(s + "/netapi/login");
-            const http::Response loginResponse = request.send("POST", "email="+e+"mdp="+m, {"Content-Type: application/x-www-form-urlencoded"});
+            http::Request request(s + "/");
+            const http::Response loginResponse = request.send("GET", "[GITPARAM]email="+e+"&mdp="+m, {"Content-Type: application/x-www-form-urlencoded"});
             std::cout << std::string(loginResponse.body.begin(), loginResponse.body.end()) << '\n'; // print the result
         }
     private:
@@ -30,7 +30,7 @@ class NetClient {
 }
 
 int main(){
-    GitAne::NetClient cTest("http://www.google.com","test@test.com","testest");
+    GitAne::NetClient cTest("localhost:8087","test@test.com","testest");
 
     return 0;
 }
