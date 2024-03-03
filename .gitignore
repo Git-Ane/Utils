@@ -1,6 +1,8 @@
 # Exclure tous les fichiers objets
 *.o
-
+*.out
+**/*.out
+**/GitAneServer
 # Exclure également les fichiers objets dans les sous-dossiers
 **/*.o
 
