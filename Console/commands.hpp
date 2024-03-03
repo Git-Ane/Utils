@@ -5,6 +5,9 @@ using namespace std;
 #include <vector>
 
 
+
+
+
 namespace GitAne{
 
     /*! \brief A Command callable in the terminal
@@ -25,6 +28,9 @@ namespace GitAne{
             */
         string getName();
 
+        string getPlugin();
+        string getHelpMsg();
+
         /*! \brief Is function compatible with name + number of arguments
             */
         bool compatible(string nom, string nomplugin,unsigned int nbarg);
@@ -40,6 +46,7 @@ namespace GitAne{
         /*! \brief Get minimal number of arguments of Command
             */
         unsigned int getNbMinArg();
+        unsigned int getNbMaxArg();
         
     };
 
