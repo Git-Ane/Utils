@@ -5,6 +5,9 @@ using namespace std;
 #include <vector>
 #include "commands.hpp"
 
+
+
+
 namespace GitAne{
     /*! \brief A Command callable in the terminal
     */
@@ -25,10 +28,18 @@ namespace GitAne{
                 return name;
             }
 
+            string Command::getPlugin(){
+                return plugin;
+            }
+
+            string Command::getHelpMsg(){
+                return helpMessage;
+            }
+
             /*! \brief Is function compatible with name + number of arguments
             */
-            bool Command::compatible(string nom,unsigned int nbarg){
-                return (nom==name && nbarg >= nbminargs && nbarg <= nbmaxargs);
+            bool Command::compatible(string nom,string nomplugin ,unsigned int nbarg){
+                return (nom==name && nbarg >= nbminargs && nbarg <= nbmaxargs && nomplugin==plugin);
             }
 
             /*! \brief execute Command
@@ -54,6 +65,9 @@ namespace GitAne{
             */
             unsigned int Command::getNbMinArg(){
                 return nbminargs;
+            }
+            unsigned int Command::getNbMaxArg(){
+                return nbmaxargs;
             }
 
 

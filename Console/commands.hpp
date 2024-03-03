@@ -1,8 +1,15 @@
+#ifndef COMMANDS_HPP
+#define COMMANDS_HPP
+
+
 using namespace std;
 
 #include<iostream>
 #include<string>
 #include <vector>
+
+
+
 
 
 namespace GitAne{
@@ -25,9 +32,12 @@ namespace GitAne{
             */
         string getName();
 
+        string getPlugin();
+        string getHelpMsg();
+
         /*! \brief Is function compatible with name + number of arguments
             */
-        bool compatible(string nom,unsigned int nbarg);
+        bool compatible(string nom, string nomplugin,unsigned int nbarg);
 
         /*! \brief execute Command
             */
@@ -40,6 +50,7 @@ namespace GitAne{
         /*! \brief Get minimal number of arguments of Command
             */
         unsigned int getNbMinArg();
+        unsigned int getNbMaxArg();
         
     };
 
@@ -64,3 +75,5 @@ namespace GitAne{
     }
     
 }
+
+#endif
