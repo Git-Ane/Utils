@@ -1,4 +1,5 @@
 #include "generated_includes.hpp"
+#include "joke/joke.hpp"
 #include "../commands.hpp"
 
 
@@ -7,7 +8,6 @@
 #include <string>
 #include <vector>
 
-void generate_include_file(vector<string> f);
 
 
 namespace GitAne{
