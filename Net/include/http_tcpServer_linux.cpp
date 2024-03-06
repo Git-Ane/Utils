@@ -2,10 +2,12 @@
 #include "http_tcpServer_linux.h"
 #include "HTTPRequest.hpp"
 #include "url_tree.hpp"
+#include <cstddef>
 #include <cstring>
+#include <fstream>
 #include <functional>
 #include <sstream>
-
+#include "json.hpp"
 
 /*
 
@@ -16,11 +18,45 @@ Still in work. Only support redirection & URL tree yet. Missing:
 - Database for register/login
 - Everything related to 
 */
-
+using json = nlohmann::json;
 namespace GitAne::Net
 {    
 
-    std::string buildDefaultResponse(){
+    // UTILITAIRES 
+    std::string extractGitParams(const std::string& input) {
+        /*
+        * Extrait les paramètres d'une requête
+        */
+        std::istringstream iss(input);
+        std::string line;
+
+        while (std::getline(iss, line)) {
+            if (line.find("[GITPARAM]") == 0) {
+                return line.substr(10);
+            }
+        }
+        return ""; 
+    }
+    std::map<std::string, std::string> parseQueryString(const std::string& queryString) {
+        std::map<std::string, std::string> result;
+        std::istringstream iss(queryString);
+
+        std::string token;
+        while (std::getline(iss, token, '&')) {
+            size_t pos = token.find('=');
+            if (pos != std::string::npos) {
+                std::string key = token.substr(0, pos);
+                std::string value = token.substr(pos + 1);
+                result[key] = value;
+            }
+        }
+
+        return result;
+    }
+
+    // Default Builds
+
+    std::string buildDefaultResponse(std::string method, std::string args){
         /*
         Default print for the API, accessible using only your domain name.
         It (will) print to you all the availables URLs & descriptors (according to the plug-ins).
@@ -34,7 +70,7 @@ namespace GitAne::Net
         return s;
     }
 
-     std::string buildLoginResponse(){
+     std::string buildLoginResponse(std::string method, std::string args){
         /*
         Default print for the API, accessible using only your domain name.
         It (will) print to you all the availables URLs & descriptors (according to the plug-ins).
@@ -47,20 +83,41 @@ namespace GitAne::Net
         std::string s = ss.str();
         return s;
     }
-    std::string buildRegisterResponse(){
+    std::string buildRegisterResponse(std::string method, std::string args){
         /*
         Default print for the API, accessible using only your domain name.
         It (will) print to you all the availables URLs & descriptors (according to the plug-ins).
         */
-        std::string htmlFile = "<!DOCTYPE html><html lang=\"en\"><body><h1>GitÂne - Register </h1><p>Debug only for now.</p></body></html>";
+        
+        auto maps= parseQueryString(args);
+        bool contiens_name = maps.find("name") != maps.end();
+        bool contiens_pwd = maps.find("pwd") != maps.end();
+        if(!contiens_name || !contiens_pwd){
+            std::string htmlFile = "<!DOCTYPE html><html lang=\"en\"><body><h1>GitÂne - Register </h1><p>Missing arguments. Need name & pwd.</p></body></html>";
+            std::ostringstream ss;
+            ss << "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: " << htmlFile.size() << "\n\n"
+            << htmlFile;
+            std::string s = ss.str();
+            return s;
+        }
+        std::string username= maps["name"];
+        std::string pwd = maps["pwd"];
+        std::string htmlFile = "<!DOCTYPE html><html lang=\"en\"><body><h1>GitÂne - Register </h1><p>" + username + " "+ pwd + "</p></body></html>";
         std::ostringstream ss;
         ss << "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: " << htmlFile.size() << "\n\n"
-           << htmlFile;
-
+        << htmlFile;
         std::string s = ss.str();
+
+        std::ifstream f("./bdd/users.json");
+        json data = json::parse(f);
+        /*
+        TODO
+        */
         return s;
+        
+
     }
-    std::string buildRegister2Response(){
+    std::string buildRegister2Response(std::string method, std::string args){
         /*
         Default print for the API, accessible using only your domain name.
         It (will) print to you all the availables URLs & descriptors (according to the plug-ins).
@@ -75,8 +132,8 @@ namespace GitAne::Net
     }
     /* PRIMITIVES */
     TcpServer::TcpServer(std::string d, int p):
-        domain(d), port(p), max_curr_conn(100), BUFFER_SIZE(30720),
-        serverMessage(buildDefaultResponse())
+        max_curr_conn(100),id_socket(),new_socket(),sockAddr_len(),port(p),sockAddr(),BUFFER_SIZE(30720),domain(d),
+        serverMessage(buildDefaultResponse("",""))
     {
 
         sockAddr.sin_family = AF_INET;
@@ -127,6 +184,8 @@ namespace GitAne::Net
 
         return {method, url};
     }
+
+    
 
     void TcpServer::stopListening(){
 
@@ -182,9 +241,9 @@ namespace GitAne::Net
             ss << "Received:\n " << buffer;
             std::cout << ss.str();
             auto [method,url] = urlAndMethod(buffer);
+            std::string params = extractGitParams(buffer);
             try{
-                std::cout << "\nEssaye de trouver pour l'url " << url << "\n";
-                std::function<std::string()> associatedFun = urlTree.getActionForUrl(url);
+                std::function<std::string(std::string method, std::string args)> associatedFun = urlTree.getActionForUrl(url);
                 if(associatedFun == nullptr) {
                     std::string htmlFile = "<!DOCTYPE html><html lang=\"en\"><body><h1>GitÂne - 404, looks like you are lost. </h1><p>TODO: Add explaination about where to go for what.</p><br/> <h2> Installed Plugins </h2> <p>Nothing there yet.</p></body></html>";
                     std::ostringstream ss;
@@ -195,15 +254,15 @@ namespace GitAne::Net
 
                 }
                 else {
-                std::string m = (urlTree.getActionForUrl(url)) ();
+                std::string m = (urlTree.getActionForUrl(url)) (method,params);
                 sendResponse(m);
+
                 }
                 
             }
             catch (const std::bad_function_call& e) {
                     std::cerr << e.what();
-            }
-            
+            };
             close(new_socket);
         }
 
@@ -213,7 +272,7 @@ namespace GitAne::Net
         long bytesSent;
         bytesSent = write(new_socket, msg.c_str(), msg.size());
 
-        if (bytesSent == msg.size())
+        if ((long unsigned int)bytesSent == msg.size())
         {
             std::cout << ("------ Server Response sent to client ------\n\n");
         }

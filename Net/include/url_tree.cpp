@@ -6,13 +6,13 @@ void Node::addChild(const std::string& urlPart, const Node& child) {
     children[urlPart] = child;
 }
 
-void Node::addLeaf(const std::string& name, std::function<std::string()> leafAction) {
+void Node::addLeaf(const std::string& name, std::function<std::string(std::string method, std::string args)> leafAction) {
     Node leaf = Node();
     leaf.action = leafAction;
     children[name] = leaf;
 }
 
-void UrlTree::addPath(const std::string& path, std::function<std::string()> action) {
+void UrlTree::addPath(const std::string& path, std::function<std::string(std::string method, std::string args)> action) {
     Node* currentNode = &root;
 
     size_t start = 0;
@@ -45,7 +45,7 @@ void UrlTree::printTree() const {
     printTreeHelper(root, "");
 }
 
-std::function<std::string()> UrlTree::getActionForUrl(const std::string& url) const {
+std::function<std::string(std::string method, std::string args)> UrlTree::getActionForUrl(const std::string& url) const {
     const Node* currentNode = &root;
 
     size_t start = 0;
