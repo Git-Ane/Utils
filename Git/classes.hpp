@@ -9,11 +9,11 @@ namespace Gitane{
     class GitRepo
     {
     private:
-        string worktree;
-        string gitdir;
-        string conf;
+        string worktree; // URL de l'espace de travail
+        string gitdir; // worktree + .git
+        string conf; // dossier de config
     public:
-        GitRepo(string path, bool force=false);
+        GitRepo(string path, bool force=false); // force=true => le créer.
     };
 
     class GitObject
@@ -21,9 +21,9 @@ namespace Gitane{
     public:
         GitObject(string data="");
 
-        string serialize(GitRepo repo);
+        /*virtual*/ string serialize(GitRepo repo);
 
-        void deserialize(string data);
+        /*virtual*/ void deserialize(string data);
 
         void init();
     };
@@ -35,7 +35,7 @@ namespace Gitane{
         void deserialize(string data);
     };
 
-    class GitCommit : public GitObject      //the man the myth the legend !
+    class GitCommit : public GitObject      // 1/10 the man the myth the legend !
     {
         string serialize(GitRepo repo);
 
@@ -101,5 +101,56 @@ namespace Gitane{
             vector<string> absolute;
             map<string,string> scoped;      //pas sur du type
     };
+
+    /* Mes propositions */
+    /*
+    Le seul problème c'est les dossiers:
+    - Si les dossiers sont des fichiers, il faut faire un GitIndexTree avec pour feuille les fichiers & pour noeud les dossiers
+    - Si GitIndexEntry c'est uniquement les fichiers alors les types sont ok normalement.
+    */
+    class GitIndexEntryServer{
+        public:
+            GitIndexEntryServer(int ctimearg, int mtimearg, int uidarg,int gidarg,int fsizearg, string shaarg, string contenu, string namearg);
+        private:
+            //derniere fois ou la metadata du fichier a change
+            pair<int,int> ctime;
+            //derniere fois ou la data du fichier a change
+            pair<int,int> mtime;
+            
+            //id of user
+            int uid;
+            //group id of owner
+            int gid;
+            int fsize;
+            string sha;
+            string contenu; // Seulmement si le contenu est pas retrouvable depuis le sha.
+            string name;
+    };
+
+    class GitIndexEntryClient{
+        public:
+            GitIndexEntryClient(int ctimearg, int mtimearg, int uidarg,int gidarg,int fsizearg, string shaarg, string path, string namearg);
+        private:
+            //derniere fois ou la metadata du fichier a change
+            pair<int,int> ctime;
+            //derniere fois ou la data du fichier a change
+            pair<int,int> mtime;
+            
+            //id of user
+            int uid;
+            //group id of owner
+            int gid;
+            int fsize;
+            string sha;
+            string path;
+            string name;
+    };
+
+    /* Idée:
+    - Le serveur stocke tout le contenu du fichier
+    - Le client stocke que le path, ça sert à rien de stocker 2x l'informations.
+    - Quand le client pull, gitane modifie le fichier à l'url indiqué par le path
+    - Quand le client commit, gitane envoie le contenu du fichier à l'url indiqué par le path
+    */
 
 }
