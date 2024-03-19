@@ -3,6 +3,7 @@ using namespace std;
 #include<iostream>
 #include<string>
 #include <vector>
+#include "../Git/classes.hpp"
 
 #include "Plugins/plugin_loader.hpp"
 
@@ -72,6 +73,10 @@ namespace GitAne{
                 }
                 cout << def << " -> " << c.getHelpMsg() << endl;
         }
+
+        void repo_init(vector<string> _){
+            GitAne::create_repo(fs::current_path());
+        }
     }
 }
 
@@ -85,6 +90,7 @@ int main(int argc, char* argv[]) {
     addCommand("help",&std_helpmsg,"Help message about std plugin",0,0);
     addCommand("hello",&sayHello,"says hello :)",0,0); 
     addCommand("concatenate",&concatenate,"concatenates arg1 and arg2 (returns arg1 if only 1 argument)",1,2); 
+    addCommand("init",&repo_init,"inits the current repository to be a Gitane repository",0,0);
 
     plugin_loader();
 

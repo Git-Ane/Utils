@@ -1,4 +1,3 @@
-#include "generated_includes.hpp"
 #include "joke/joke.hpp"
 #include "../commands.hpp"
 

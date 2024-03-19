@@ -1,20 +1,35 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <filesystem>
+#include <stdexcept>
+#include <iostream>
+#include <fstream>
+#include "../Console/commands.hpp"
+
+namespace fs = std::filesystem;
 
 using namespace std;
 
+void create_dir(fs::path);
+ofstream create_file(fs::path);
 
-namespace Gitane{
+namespace GitAne{
+
+
+
     class GitRepo
     {
     private:
-        string worktree; // URL de l'espace de travail
-        string gitdir; // worktree + .git
-        string conf; // dossier de config
+        fs::path worktree; // URL de l'espace de travail
+        fs::path gitdir; // worktree + .git
+        fs::path conf; // dossier de config
     public:
-        GitRepo(string path, bool force=false); // force=true => le créer.
+        GitRepo(fs::path path, bool force=false); // force=true => le créer.
+        fs::path get_gitdir();
     };
+
+    GitRepo create_repo(fs::path);
 
     class GitObject
     {
@@ -44,7 +59,7 @@ namespace Gitane{
         void init();
     };
 
-    class GitTag : public GitCommit{};      //g pas compris a koi ca servait mdr
+    class GitTag : public GitAne::GitCommit{};      //g pas compris a koi ca servait mdr
 
     class GitTree : public GitObject{
         string serialize(GitRepo repo);
