@@ -6,6 +6,12 @@
 **/GitAneServer
 # Exclure également les fichiers objets dans les sous-dossiers
 **/*.o
+Net/include/bdd/users.json
+
+Net/a
+Net/b
+Net/test_json.cpp
+
 
 #Exclure les fichiers de config perso
 .vscode/settings.json
