@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include "../Console/commands.hpp"
-
+#include "../SHA-warma/shawarma.hpp"
 namespace fs = std::filesystem;
 
 using namespace std;
@@ -30,6 +30,9 @@ namespace GitAne{
     };
 
     GitRepo create_repo(fs::path);
+    GitRepo repo_find(fs::path);
+
+    bool write_to_git_object(const std::string &, GitRepo);
 
     class GitObject
     {
