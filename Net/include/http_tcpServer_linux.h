@@ -1,5 +1,13 @@
 // Code from a course on medium, rewritten for GitÂne.
 // Utils/Net/include/http_tcpServer_linux.cpp
+#ifndef base
+#include <cstddef>
+#include <cstring>
+#include <fstream>
+#include <functional>
+#include <map>
+#include <sstream>
+#endif 
 #include "HTTPRequest.hpp"
 #include "iostream"
 #include <netinet/in.h>
@@ -7,6 +15,7 @@
 #include <sys/socket.h>
 #include "url_tree.hpp"
 #include <arpa/inet.h> // inet passe d'un char* à un int
+#include "http_subsystems/login_and_register.hpp"
 namespace GitAne::Net
 {    
     

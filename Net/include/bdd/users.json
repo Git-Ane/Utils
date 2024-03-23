@@ -1,3 +1,10 @@
 {
-    
+  "ddd": "eee",
+  "test@test.com2": {
+    "pwd": "testest",
+    "tok": "test@test.com2testest"
+  },
+  "user1": {
+    "mdp": "bidule"
+  }
 }
