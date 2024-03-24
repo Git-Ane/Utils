@@ -1,5 +1,5 @@
 #include "shawarma.hpp"
-namespace GitAne::Shawarma{
+namespace GitAne{
     /*
     IDEE:
     Si on veut hasher CACA et que c'est:
@@ -34,5 +34,3 @@ namespace GitAne::Shawarma{
 
    
 }
-
-int main(){return 0;}

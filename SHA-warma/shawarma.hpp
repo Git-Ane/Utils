@@ -6,5 +6,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <fstream>
-
+#include<iomanip>
+namespace GitAne{
 std::string sha1(const std::string &input);
+}
