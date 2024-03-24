@@ -64,6 +64,7 @@ namespace GitAne{
 
         ofstream descr = create_file(repo.get_gitdir() / "descr");
         descr << "Bonjour je suis une description";
+        descr.close();
 
         ofstream head = create_file(repo.get_gitdir() / "HEAD");
         head << "ref: refs/heads/master"; // jsp ce que ça veut dire lol
@@ -78,7 +79,8 @@ namespace GitAne{
         ofstream conf = create_file(repo.get_gitdir() / "conf");
         conf << "# write what you want here, we will carefully ignore it.";
 
-        descr.close();
+        conf.close();
+        
 
         return repo;
     }
@@ -112,6 +114,17 @@ namespace GitAne{
         f.close();
         return true;
     }
+
+    GitObject::GitObject(string data){
+        if(data!=""){
+            deserialize(data);
+        }
+        else{
+            init();
+        }
+    }
+
+    void GitObject::init(){}
 
 
 }
