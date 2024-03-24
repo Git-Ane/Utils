@@ -19,7 +19,7 @@ $(shell mkdir -p build)
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ) -lssl -lcrypto
 
 build/%.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@ -lssl -lcrypto
