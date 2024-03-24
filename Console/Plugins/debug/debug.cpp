@@ -5,7 +5,7 @@ using namespace GitAne::Console;
 
 namespace GitAne{
 
-    namespace Joke{
+    namespace Debug{
         void hash(vector<string> args){
             if(args.size() < 1){
                 cerr << "Hash a besoin d'un nom de fonction.";

@@ -126,7 +126,11 @@ namespace GitAne{
 
     void GitObject::init(){}
 
-    string GitBlob::serialize(){
+    string GitObject::serialize(GitRepo repo){throw logic_error("Pas implemente");}
+
+    void GitObject::deserialize(string data){throw logic_error("Pas implemente");}
+
+    string GitBlob::serialize(GitRepo repo){
         return blobdata;
     }
 
@@ -166,7 +170,7 @@ namespace GitAne{
     // Read and validate object size
     size_t y = raw.find('\x00', x);
     int size = std::stoi(raw.substr(x, y - x));
-    if (size != decompressedSize - y - 1) {
+    if (static_cast<uLong>(size) != decompressedSize - y - 1) {
         throw std::runtime_error("Malformed object " + sha + ": bad length");
     }
 

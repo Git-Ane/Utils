@@ -52,7 +52,7 @@ namespace GitAne{
     class GitBlob : public GitObject
     {
     public:
-        string serialize();     //pas sur de si il faut mieux mettre ou ne pas mettre d'argument (telle est la question mdr)
+        string serialize(GitRepo repo);     //pas sur de si il faut mieux mettre ou ne pas mettre d'argument (telle est la question mdr)
 
         void deserialize(string data);
 
