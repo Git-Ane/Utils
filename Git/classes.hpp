@@ -7,6 +7,7 @@
 #include <fstream>
 #include "../Console/commands.hpp"
 #include "../SHA-warma/shawarma.hpp"
+#include <openssl/sha.h>
 namespace fs = std::filesystem;
 
 using namespace std;

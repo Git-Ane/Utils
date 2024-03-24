@@ -1,5 +1,5 @@
 #include "classes.hpp"
-#include <openssl/sha.h> // omg ça a marché mdr letsgo
+
 using namespace std;
 namespace fs = std::filesystem;
 using namespace GitAne;
