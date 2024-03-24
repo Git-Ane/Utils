@@ -126,5 +126,70 @@ namespace GitAne{
 
     void GitObject::init(){}
 
+    string GitBlob::serialize(){
+        return blobdata;
+    }
+
+    void GitBlob::deserialize(string data){
+        blobdata = data;
+    }
+
+    GitObject read_object(GitRepo repo, string sha){
+        fs::path path = repo.get_gitdir() / sha.substr(0,2) / sha.substr(2,sha.size()-2);
+
+        if(!(fs::exists(path))){throw invalid_argument(path.string() + " does not exist !");}
+
+        ifstream file(path);
+        std::stringstream buffer;
+        buffer << file.rdbuf(); // Read the entire file into the stringstream buffer
+
+        std::string content = buffer.str(); // Convert the buffer to a string
+
+        std::cout << "Content of the file:" << std::endl;
+        std::cout << content << std::endl;
+
+        file.close();
+
+         std::string raw = buffer.str();
+
+    // Decompress the raw content using zlib
+    std::vector<unsigned char> decompressed(raw.size());
+    uLong decompressedSize = decompressed.size();
+    if (uncompress(decompressed.data(), &decompressedSize, reinterpret_cast<const Bytef*>(raw.data()), raw.size()) != Z_OK) {
+        throw std::runtime_error("Failed to decompress object.");
+    }
+
+    // Read object type
+    size_t x = raw.find(' ');
+    std::string fmt = raw.substr(0, x);
+
+    // Read and validate object size
+    size_t y = raw.find('\x00', x);
+    int size = std::stoi(raw.substr(x, y - x));
+    if (size != decompressedSize - y - 1) {
+        throw std::runtime_error("Malformed object " + sha + ": bad length");
+    }
+
+    // Pick constructor based on object type
+    GitObject* obj = nullptr;
+    if (fmt == "commit") {
+        obj = new GitCommit();
+    } else if (fmt == "tree") {
+        obj = new GitTree();
+    } else if (fmt == "tag") {
+        obj = new GitTag();
+    } else if (fmt == "blob") {
+        obj = new GitBlob();
+    } else {
+        throw std::runtime_error("Unknown type " + fmt + " for object " + sha);
+    }
+
+    // Process the object content and return the GitObject
+    // You may need to define a method to process the object content
+    // based on the object type.
+
+    return *obj;
+    }
+
 
 }

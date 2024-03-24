@@ -8,6 +8,7 @@
 #include "../Console/commands.hpp"
 #include "../SHA-warma/shawarma.hpp"
 #include <openssl/sha.h>
+#include <zlib.h>
 namespace fs = std::filesystem;
 
 using namespace std;
@@ -35,23 +36,28 @@ namespace GitAne{
 
     bool write_to_git_object(const std::string &, GitRepo);
 
+
     class GitObject
     {
     public:
         GitObject(string data="");
 
-        /*virtual*/ string serialize(GitRepo repo);
+        string serialize(GitRepo repo);
 
-        /*virtual*/ void deserialize(string data);
+        void deserialize(string data);
 
         void init();
     };
 
     class GitBlob : public GitObject
     {
+    public:
         string serialize();     //pas sur de si il faut mieux mettre ou ne pas mettre d'argument (telle est la question mdr)
 
         void deserialize(string data);
+
+    private:
+        string blobdata;
     };
 
     class GitCommit : public GitObject      // 1/10 the man the myth the legend !
@@ -118,7 +124,7 @@ namespace GitAne{
     class GitIgnore{
         private:
             vector<string> absolute;
-            map<string,string> scoped;      //pas sur du type
+            map<string,string> scoped;      //pas sur du type (ben j'avoue un type avec rien en public jsuis pas sur mdr)
     };
 
     /* Mes propositions */
@@ -164,6 +170,9 @@ namespace GitAne{
             string path;
             string name;
     };
+
+    GitObject read_object(GitRepo repo, string sha);
+
 
     /* Idée:
     - Le serveur stocke tout le contenu du fichier
