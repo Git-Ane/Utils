@@ -1,4 +1,3 @@
-using namespace std;
 #include "debug.hpp"
 using namespace GitAne::Console;
 
@@ -16,7 +15,7 @@ namespace GitAne{
 
 
         void debug_plugin_loader(){
-            initPlugin("joke");
+            initPlugin("debug");
             addCommand("hash",&hash,"print the hash value of a specific file",1,1);
         }
     }

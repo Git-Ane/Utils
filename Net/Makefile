@@ -20,10 +20,10 @@ $(shell mkdir -p build/include)
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ) -lssl -lcrypto -lz
 
 build/%.o: %.cpp
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@ -lssl -lcrypto -lz
 
 clean:
 	rm -rf build
