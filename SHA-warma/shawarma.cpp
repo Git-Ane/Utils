@@ -34,5 +34,3 @@ namespace GitAne::Shawarma{
 
    
 }
-
-int main(){return 0;}
