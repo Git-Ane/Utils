@@ -1,4 +1,5 @@
 #include "joke/joke.hpp"
+#include "debug/debug.hpp"
 #include "../commands.hpp"
 
 
