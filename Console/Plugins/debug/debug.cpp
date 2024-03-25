@@ -10,7 +10,7 @@ namespace GitAne{
             if(args.size() < 1){
                 cerr << "Hash a besoin d'un nom de fonction.";
             }
-            
+            cout << "Hash of your file: " << GitAne::sha1(args[0]);
         }
 
 
