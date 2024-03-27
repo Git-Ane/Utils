@@ -87,10 +87,9 @@ namespace GitAne{
 
     
 
-    bool write_to_git_object(GitRepo repo) {
+    bool write_to_git_object(GitRepo repo, GitBlob *refobj) {       //si t'arrive a mettre tu polymorphisme la dessus gg
 
-        GitBlob obj("");
-        obj.deserialize("prout");
+        GitBlob obj = *refobj;
 
         string content = obj.serialize(repo);
 
@@ -104,6 +103,8 @@ namespace GitAne{
         result.insert(result.end(), content.begin(), content.end());
 
         std::string resultString(result.begin(), result.end());
+
+        cout<< resultString << endl;
 
 
         std::string hash = sha1(resultString);

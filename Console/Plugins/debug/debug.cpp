@@ -16,8 +16,9 @@ namespace GitAne{
 
         void write_file(vector<string> args){
             GitRepo repo = repo_find("");
-            GitObject blob("prout"); // Create a GitBlob object with content "prout"
-            if(write_to_git_object(repo)){ // Pass the pointer to blob
+            GitBlob blob("prout"); // Create a GitBlob object with content "prout"
+            blob.deserialize(args[0]);
+            if(write_to_git_object(repo,&blob)){ // Pass the pointer to blob
                 cout << "File written successfully !" << endl;
             }
         }

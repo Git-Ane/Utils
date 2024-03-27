@@ -38,7 +38,6 @@ namespace GitAne{
     GitRepo create_repo(fs::path);
     GitRepo repo_find(fs::path);
 
-    bool write_to_git_object(GitRepo repo);
 
 
     class GitObject
@@ -193,6 +192,8 @@ namespace GitAne{
             string path;
             string name;
     };
+
+    bool write_to_git_object(GitRepo repo, GitBlob*);
 
     GitObject read_object(GitRepo repo, string sha);
 
