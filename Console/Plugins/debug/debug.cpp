@@ -16,14 +16,24 @@ namespace GitAne{
 
         void write_file(vector<string> args){
             GitRepo repo = repo_find("");
-            if(write_to_git_object( args[0],repo)){cout<< "File written successfully !" << endl;}
+            GitObject blob("prout"); // Create a GitBlob object with content "prout"
+            if(write_to_git_object(repo)){ // Pass the pointer to blob
+                cout << "File written successfully !" << endl;
+            }
+        }
+
+
+
+        void read_object(vector<string> args){
+            GitRepo repo = repo_find("");
+
         }
 
 
         void debug_plugin_loader(){
             initPlugin("debug");
             addCommand("hash",&hash,"print the hash value of a specific file",1,1);
-            addCommand("write_file",&write_file,"writes file arg1 in .git folder",1,1);
+            addCommand("write_file",&write_file,"writes file arg1 in .git folder as a blob",1,1);
         }
     }
 

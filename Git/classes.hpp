@@ -38,7 +38,7 @@ namespace GitAne{
     GitRepo create_repo(fs::path);
     GitRepo repo_find(fs::path);
 
-    bool write_to_git_object(fs::path, GitRepo);
+    bool write_to_git_object(GitRepo repo);
 
 
     class GitObject
@@ -49,9 +49,9 @@ namespace GitAne{
 
         GitObject(string data="");
 
-        string serialize(GitRepo repo);
+        virtual string serialize(GitRepo repo);
 
-        void deserialize(string data);
+        virtual void deserialize(string data);
 
         void init();
     };
@@ -60,11 +60,13 @@ namespace GitAne{
     {
     public:
 
+        GitBlob(const std::string& data) : GitObject(data) {}
+
         string fmt = "blob";
 
-        string serialize(GitRepo repo);     //pas sur de si il faut mieux mettre ou ne pas mettre d'argument (telle est la question mdr)
+        virtual string serialize(GitRepo repo) override;     //pas sur de si il faut mieux mettre ou ne pas mettre d'argument (telle est la question mdr)
 
-        void deserialize(string data);
+        virtual void deserialize(string data) override;
 
     private:
         string blobdata;
@@ -76,9 +78,9 @@ namespace GitAne{
 
         string fmt = "commit";
 
-        string serialize(GitRepo repo);
+        virtual string serialize(GitRepo repo);
 
-        void deserialize(string data);
+        virtual void deserialize(string data);
 
         void init();
     };
@@ -86,12 +88,16 @@ namespace GitAne{
     class GitTag : public GitAne::GitCommit{
     public:
         string fmt = "tag";
-    };      //g pas compris a koi ca servait mdr
+
+        virtual string serialize(GitRepo repo);
+
+        virtual void deserialize(string data);
+    };      
 
     class GitTree : public GitObject{
-        string serialize(GitRepo repo);
+        virtual string serialize(GitRepo repo);
 
-        void deserialize(string data);
+        virtual void deserialize(string data);
 
         void init();
     };

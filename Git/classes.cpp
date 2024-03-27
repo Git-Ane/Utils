@@ -87,19 +87,28 @@ namespace GitAne{
 
     
 
-    bool write_to_git_object(fs::path file_path, GitRepo rep) {
-        std::ifstream input_file(file_path, std::ios::binary);
-        if (!input_file) {
-            std::cerr << "Erreur: Impossible d'ouvrir le fichier " << file_path << std::endl;
-            return false;
-        }
+    bool write_to_git_object(GitRepo repo) {
 
-        std::stringstream buffer;
-        buffer << input_file.rdbuf();
-        std::string content = buffer.str();
-        std::string hash = sha1(content);
+        GitBlob obj("");
+        obj.deserialize("prout");
 
-        fs::path git_objects_folder = rep.get_gitdir()/ "objects"/ hash.substr(0, 2);
+        string content = obj.serialize(repo);
+
+        std::vector<unsigned char> result;
+
+        result.insert(result.end(), obj.fmt.begin(), obj.fmt.end());
+        result.push_back(' '); // Space character
+        std::string lenStr = std::to_string(content.length());
+        result.insert(result.end(), lenStr.begin(), lenStr.end());
+        result.push_back('\0'); // Null character
+        result.insert(result.end(), content.begin(), content.end());
+
+        std::string resultString(result.begin(), result.end());
+
+
+        std::string hash = sha1(resultString);
+
+        fs::path git_objects_folder = repo.get_gitdir()/ "objects"/ hash.substr(0, 2);
         if(fs::exists(git_objects_folder)){
             if(fs::exists(git_objects_folder / hash.substr(2))){
                 std::cerr << "COLLISION DE SHA, IMPOSSIBLE ?! NANI ! LA FIN DU MODNE ! LE BITCOIN S'EFFONDRE nfaie hffiezf";
@@ -110,14 +119,14 @@ namespace GitAne{
             create_dir(git_objects_folder);
         }
         ofstream f = create_file(git_objects_folder /   hash.substr(2));
-        f << content; // Je suis pas sûr qu'on doive mettre le contenu ici, à voir.
+        f << resultString; // Je suis pas sûr qu'on doive mettre le contenu ici, à voir.
         f.close();
         return true;
     }
 
     GitObject::GitObject(string data){
         if(data!=""){
-            deserialize(data);
+            //deserialize(data);
         }
         else{
             init();
@@ -137,6 +146,18 @@ namespace GitAne{
     void GitBlob::deserialize(string data){
         blobdata = data;
     }
+
+    string GitCommit::serialize(GitRepo repo){}
+
+    void GitCommit::deserialize(string data){}
+
+    string GitTag::serialize(GitRepo repo){}
+
+    void GitTag::deserialize(string data){}
+
+    string GitTree::serialize(GitRepo repo){}
+
+    void GitTree::deserialize(string data){}
 
     GitObject read_object(GitRepo repo, string sha){
         fs::path path = repo.get_gitdir() / sha.substr(0,2) / sha.substr(2,sha.size()-2);
@@ -183,7 +204,7 @@ namespace GitAne{
         } else if (fmt == "tag") {
             obj = new GitTag();
         } else if (fmt == "blob") {
-            obj = new GitBlob();
+            obj = new GitBlob(content);
         } else {
             throw std::runtime_error("Unknown type " + fmt + " for object " + sha);
         }
