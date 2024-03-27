@@ -1,3 +1,7 @@
+#ifndef CLASSES_HPP
+#define CLASSES_HPP
+
+
 #include <string>
 #include <map>
 #include <vector>
@@ -34,12 +38,15 @@ namespace GitAne{
     GitRepo create_repo(fs::path);
     GitRepo repo_find(fs::path);
 
-    bool write_to_git_object(const std::string &, GitRepo);
+    bool write_to_git_object(fs::path, GitRepo);
 
 
     class GitObject
     {
     public:
+
+        string fmt="";
+
         GitObject(string data="");
 
         string serialize(GitRepo repo);
@@ -52,6 +59,9 @@ namespace GitAne{
     class GitBlob : public GitObject
     {
     public:
+
+        string fmt = "blob";
+
         string serialize(GitRepo repo);     //pas sur de si il faut mieux mettre ou ne pas mettre d'argument (telle est la question mdr)
 
         void deserialize(string data);
@@ -62,6 +72,10 @@ namespace GitAne{
 
     class GitCommit : public GitObject      // 1/10 the man the myth the legend !
     {
+    public:
+
+        string fmt = "commit";
+
         string serialize(GitRepo repo);
 
         void deserialize(string data);
@@ -69,7 +83,10 @@ namespace GitAne{
         void init();
     };
 
-    class GitTag : public GitAne::GitCommit{};      //g pas compris a koi ca servait mdr
+    class GitTag : public GitAne::GitCommit{
+    public:
+        string fmt = "tag";
+    };      //g pas compris a koi ca servait mdr
 
     class GitTree : public GitObject{
         string serialize(GitRepo repo);
@@ -182,3 +199,6 @@ namespace GitAne{
     */
 
 }
+
+#endif
+

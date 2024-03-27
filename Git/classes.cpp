@@ -87,7 +87,7 @@ namespace GitAne{
 
     
 
-    bool write_to_git_objects(const std::string &file_path, GitRepo rep) {
+    bool write_to_git_object(fs::path file_path, GitRepo rep) {
         std::ifstream input_file(file_path, std::ios::binary);
         if (!input_file) {
             std::cerr << "Erreur: Impossible d'ouvrir le fichier " << file_path << std::endl;
@@ -156,43 +156,39 @@ namespace GitAne{
 
          std::string raw = buffer.str();
 
-    // Decompress the raw content using zlib
-    std::vector<unsigned char> decompressed(raw.size());
-    uLong decompressedSize = decompressed.size();
-    if (uncompress(decompressed.data(), &decompressedSize, reinterpret_cast<const Bytef*>(raw.data()), raw.size()) != Z_OK) {
-        throw std::runtime_error("Failed to decompress object.");
-    }
+        // Decompress the raw content using zlib
+        std::vector<unsigned char> decompressed(raw.size());
+        uLong decompressedSize = decompressed.size();
+        if (uncompress(decompressed.data(), &decompressedSize, reinterpret_cast<const Bytef*>(raw.data()), raw.size()) != Z_OK) {
+            throw std::runtime_error("Failed to decompress object.");
+        }
 
-    // Read object type
-    size_t x = raw.find(' ');
-    std::string fmt = raw.substr(0, x);
+        // Read object type
+        size_t x = raw.find(' ');
+        std::string fmt = raw.substr(0, x);
 
-    // Read and validate object size
-    size_t y = raw.find('\x00', x);
-    int size = std::stoi(raw.substr(x, y - x));
-    if (static_cast<uLong>(size) != decompressedSize - y - 1) {
-        throw std::runtime_error("Malformed object " + sha + ": bad length");
-    }
+        // Read and validate object size
+        size_t y = raw.find('\x00', x);
+        int size = std::stoi(raw.substr(x, y - x));
+        if (static_cast<uLong>(size) != decompressedSize - y - 1) {
+            throw std::runtime_error("Malformed object " + sha + ": bad length");
+        }
 
-    // Pick constructor based on object type
-    GitObject* obj = nullptr;
-    if (fmt == "commit") {
-        obj = new GitCommit();
-    } else if (fmt == "tree") {
-        obj = new GitTree();
-    } else if (fmt == "tag") {
-        obj = new GitTag();
-    } else if (fmt == "blob") {
-        obj = new GitBlob();
-    } else {
-        throw std::runtime_error("Unknown type " + fmt + " for object " + sha);
-    }
+        // Pick constructor based on object type
+        GitObject* obj = nullptr;
+        if (fmt == "commit") {
+            obj = new GitCommit();
+        } else if (fmt == "tree") {
+            obj = new GitTree();
+        } else if (fmt == "tag") {
+            obj = new GitTag();
+        } else if (fmt == "blob") {
+            obj = new GitBlob();
+        } else {
+            throw std::runtime_error("Unknown type " + fmt + " for object " + sha);
+        }
 
-    // Process the object content and return the GitObject
-    // You may need to define a method to process the object content
-    // based on the object type.
-
-    return *obj;
+        return *obj;
     }
 
 
