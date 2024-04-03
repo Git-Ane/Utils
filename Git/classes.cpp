@@ -87,8 +87,7 @@ namespace GitAne{
 
     
 
-    bool write_to_git_object(GitRepo repo, GitBlob *refobj) {       //si t'arrive a mettre tu polymorphisme la dessus gg
-
+    bool write_to_git_object(GitRepo repo, GitBlob *refobj) {
         GitBlob obj = *refobj;
 
         string content = obj.serialize(repo);
@@ -104,23 +103,19 @@ namespace GitAne{
 
         std::string resultString(result.begin(), result.end());
 
-        cout<< resultString << endl;
-
-
         std::string hash = sha1(resultString);
 
-        fs::path git_objects_folder = repo.get_gitdir()/ "objects"/ hash.substr(0, 2);
-        if(fs::exists(git_objects_folder)){
-            if(fs::exists(git_objects_folder / hash.substr(2))){
+        fs::path git_objects_folder = repo.get_gitdir() / "objects" / hash.substr(0, 2);
+        if (fs::exists(git_objects_folder)) {
+            if (fs::exists(git_objects_folder / hash.substr(2))) {
                 std::cerr << "COLLISION DE SHA, IMPOSSIBLE ?! NANI ! LA FIN DU MODNE ! LE BITCOIN S'EFFONDRE nfaie hffiezf";
                 return false;
             }
-        }
-        else{
+        } else {
             create_dir(git_objects_folder);
         }
-        ofstream f = create_file(git_objects_folder /   hash.substr(2));
-        f << resultString; // Je suis pas sûr qu'on doive mettre le contenu ici, à voir.
+        ofstream f = create_file(git_objects_folder / hash.substr(2));
+        f << resultString; // Write the data to file
         f.close();
         return true;
     }
@@ -160,10 +155,12 @@ namespace GitAne{
 
     void GitTree::deserialize(string data){}
 
-    GitObject read_object(GitRepo repo, string sha){
-        fs::path path = repo.get_gitdir() / sha.substr(0,2) / sha.substr(2,sha.size()-2);
+    GitBlob* read_object(GitRepo repo, string sha) {
+        fs::path path = repo.get_gitdir() / "objects" / sha.substr(0, 2) / sha.substr(2, sha.size() - 2);
 
-        if(!(fs::exists(path))){throw invalid_argument(path.string() + " does not exist !");}
+        if (!(fs::exists(path))) {
+            throw invalid_argument(path.string() + " does not exist !");
+        }
 
         ifstream file(path);
         std::stringstream buffer;
@@ -176,14 +173,7 @@ namespace GitAne{
 
         file.close();
 
-         std::string raw = buffer.str();
-
-        // Decompress the raw content using zlib
-        std::vector<unsigned char> decompressed(raw.size());
-        uLong decompressedSize = decompressed.size();
-        if (uncompress(decompressed.data(), &decompressedSize, reinterpret_cast<const Bytef*>(raw.data()), raw.size()) != Z_OK) {
-            throw std::runtime_error("Failed to decompress object.");
-        }
+        std::string raw = buffer.str();
 
         // Read object type
         size_t x = raw.find(' ');
@@ -192,25 +182,22 @@ namespace GitAne{
         // Read and validate object size
         size_t y = raw.find('\x00', x);
         int size = std::stoi(raw.substr(x, y - x));
-        if (static_cast<uLong>(size) != decompressedSize - y - 1) {
+        if (static_cast<uLong>(size) != raw.size() - y - 1) {
             throw std::runtime_error("Malformed object " + sha + ": bad length");
         }
 
+        content = raw.substr(y + 1);
+
         // Pick constructor based on object type
-        GitObject* obj = nullptr;
-        if (fmt == "commit") {
-            obj = new GitCommit();
-        } else if (fmt == "tree") {
-            obj = new GitTree();
-        } else if (fmt == "tag") {
-            obj = new GitTag();
-        } else if (fmt == "blob") {
+        GitBlob* obj = nullptr;
+        if (fmt == "blob") {
             obj = new GitBlob(content);
+            obj->deserialize(content);
         } else {
             throw std::runtime_error("Unknown type " + fmt + " for object " + sha);
         }
 
-        return *obj;
+        return obj;
     }
 
 

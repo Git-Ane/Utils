@@ -195,7 +195,7 @@ namespace GitAne{
 
     bool write_to_git_object(GitRepo repo, GitBlob*);
 
-    GitObject read_object(GitRepo repo, string sha);
+    GitBlob* read_object(GitRepo repo, string sha);
 
 
     /* Idée:
