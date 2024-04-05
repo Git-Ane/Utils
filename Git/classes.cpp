@@ -87,14 +87,19 @@ namespace GitAne{
 
     
 
-    bool write_to_git_object(GitRepo repo, GitBlob *refobj) {
-        GitBlob obj = *refobj;
+    bool write_to_git_object(GitRepo repo, GitObject& obj) {
+        /*
+        * Entrée: Réf d'un GitObj
+        * Sortie: True si on a pu l'écrire à l'URL donnée par le SHA
+        */
+        // Normalement ça marche et c'est polymorphe. On utilise le fait que la référence va permettre au compilo de savoir quelle variable "fmt" chercher
+        // de même pour serialize.
 
         string content = obj.serialize(repo);
 
         std::vector<unsigned char> result;
-
-        result.insert(result.end(), obj.fmt.begin(), obj.fmt.end());
+        string fmt = obj.get_format();
+        result.insert(result.end(), fmt.begin(), fmt.end());
         result.push_back(' '); // Space character
         std::string lenStr = std::to_string(content.length());
         result.insert(result.end(), lenStr.begin(), lenStr.end());
@@ -102,7 +107,7 @@ namespace GitAne{
         result.insert(result.end(), content.begin(), content.end());
 
         std::string resultString(result.begin(), result.end());
-
+        std::cout << "On obtient: " << resultString << std::endl;
         std::string hash = sha1(resultString);
 
         fs::path git_objects_folder = repo.get_gitdir() / "objects" / hash.substr(0, 2);
@@ -129,7 +134,25 @@ namespace GitAne{
         }
     }
 
-    void GitObject::init(){}
+    string GitObject::get_format(){
+        return "";
+    }
+    string GitBlob::get_format(){
+        return "blob";
+    }
+    string GitCommit::get_format(){
+        return "commit";
+    }
+    string GitTree::get_format(){
+        return "tree";
+    }
+    string GitTag::get_format(){
+        return "tag";
+    }
+
+    void GitObject::init(){
+
+    }
 
     string GitObject::serialize(GitRepo repo){throw logic_error("Pas implemente");}
 
@@ -155,7 +178,11 @@ namespace GitAne{
 
     void GitTree::deserialize(string data){}
 
-    GitBlob* read_object(GitRepo repo, string sha) {
+    GitObject& read_object(GitRepo repo, string sha) { // Essayer avec ça. Si ça marhe pas, las passer en void, la faire prendre un GitObject* et le set dedans. On peut faire une variable qui indique le type et très facilement vérifeir le type de la variable de retour avec un Switch.        /*
+        /*
+        * Entrée: un repo, un sha
+        * Sortie: l'objet associé (sous forme de GitBlob*)
+        */
         fs::path path = repo.get_gitdir() / "objects" / sha.substr(0, 2) / sha.substr(2, sha.size() - 2);
 
         if (!(fs::exists(path))) {
@@ -174,7 +201,6 @@ namespace GitAne{
         file.close();
 
         std::string raw = buffer.str();
-
         // Read object type
         size_t x = raw.find(' ');
         std::string fmt = raw.substr(0, x);
@@ -189,15 +215,15 @@ namespace GitAne{
         content = raw.substr(y + 1);
 
         // Pick constructor based on object type
-        GitBlob* obj = nullptr;
+        
         if (fmt == "blob") {
-            obj = new GitBlob(content);
-            obj->deserialize(content);
+            static GitBlob obj = GitBlob(content);
+            obj.deserialize(content);
+            return obj;
         } else {
             throw std::runtime_error("Unknown type " + fmt + " for object " + sha);
         }
-
-        return obj;
+        
     }
 
 

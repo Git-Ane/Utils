@@ -51,6 +51,7 @@ namespace GitAne{
         virtual string serialize(GitRepo repo);
 
         virtual void deserialize(string data);
+        virtual string get_format();
 
         void init();
     };
@@ -62,7 +63,7 @@ namespace GitAne{
         GitBlob(const std::string& data) : GitObject(data) {}
 
         string fmt = "blob";
-
+        virtual string get_format() override;
         virtual string serialize(GitRepo repo) override;     //pas sur de si il faut mieux mettre ou ne pas mettre d'argument (telle est la question mdr)
 
         virtual void deserialize(string data) override;
@@ -78,7 +79,7 @@ namespace GitAne{
         string fmt = "commit";
 
         virtual string serialize(GitRepo repo);
-
+        virtual string get_format() override;
         virtual void deserialize(string data);
 
         void init();
@@ -89,13 +90,13 @@ namespace GitAne{
         string fmt = "tag";
 
         virtual string serialize(GitRepo repo);
-
+        virtual string get_format() override;
         virtual void deserialize(string data);
     };      
 
     class GitTree : public GitObject{
         virtual string serialize(GitRepo repo);
-
+        virtual string get_format() override;
         virtual void deserialize(string data);
 
         void init();
@@ -193,9 +194,9 @@ namespace GitAne{
             string name;
     };
 
-    bool write_to_git_object(GitRepo repo, GitBlob*);
+    bool write_to_git_object(GitRepo repo, GitObject&);
 
-    GitBlob* read_object(GitRepo repo, string sha);
+    GitObject& read_object(GitRepo repo, string sha);
 
 
     /* Idée:

@@ -11,19 +11,20 @@ namespace GitAne{
             if(args.size() < 1){
                 cerr << "Hash a besoin d'un nom de fonction.";
             }
+
             cout << "Hash of your file: " << GitAne::sha1(args[0]) << endl;
         }
 
         void write_file(vector<string> args){
             GitRepo repo = repo_find("");
             GitBlob blob("prout"); // Create a GitBlob object with content "prout"
+            std::cout << "La je set le fmt à " << blob.fmt << std::endl; 
             ifstream file(args[0]);
             std::stringstream buffer;
             buffer << file.rdbuf(); // Read the entire file into the stringstream buffer
-
             std::string content = buffer.str();
             blob.deserialize(content);
-            if(write_to_git_object(repo,&blob)){ // Pass the pointer to blob
+            if(write_to_git_object(repo,blob)){ // Pass the pointer to blob
                 cout << "File written successfully !" << endl;
             }
         }
@@ -32,7 +33,7 @@ namespace GitAne{
 
         void read_object_fun(vector<string> args){
             GitRepo repo = repo_find("");
-            GitBlob b = *(read_object(repo,args[0]));
+            GitObject& b = read_object(repo,args[0]);
             cout << b.serialize(repo) << endl;
         }
 
