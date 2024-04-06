@@ -13,6 +13,7 @@
 #include "../SHA-warma/shawarma.hpp"
 #include <openssl/sha.h>
 #include <zlib.h>
+#include <unordered_map>
 namespace fs = std::filesystem;
 
 using namespace std;
@@ -72,6 +73,10 @@ namespace GitAne{
         string blobdata;
     };
 
+    unordered_map<string, string> kvlm_parse(const string& raw, size_t start = 0, unordered_map<string, string> dct = {});
+
+    string kvlm_serialize(const unordered_map<string, string>& kvlm);
+
     class GitCommit : public GitObject      // 1/10 the man the myth the legend !
     {
     public:
@@ -83,6 +88,9 @@ namespace GitAne{
         virtual void deserialize(string data);
 
         void init();
+
+    private:
+        unordered_map<string, string> kvlm;
     };
 
     class GitTag : public GitAne::GitCommit{

@@ -166,9 +166,77 @@ namespace GitAne{
         blobdata = data;
     }
 
-    string GitCommit::serialize(GitRepo repo){}
+    unordered_map<string, string> kvlm_parse(const string& raw, size_t start, unordered_map<string, string> dct) {
+        size_t spc = raw.find(' ', start);
+        size_t nl = raw.find('\n', start);
 
-    void GitCommit::deserialize(string data){}
+        if (spc == string::npos || nl < spc) {
+            dct[string()] = raw.substr(start + 1);
+            return dct;
+        }
+
+        string key = raw.substr(start, spc - start);
+
+        size_t end = start;
+        while (true) {
+            end = raw.find('\n', end + 1);
+            if (raw[end + 1] != ' ') break;
+        }
+
+        string value = raw.substr(spc + 1, end - spc - 1);
+        size_t pos;
+        while ((pos = value.find("\n ")) != string::npos) {
+            value.replace(pos, 2, "\n");
+        }
+
+        if (dct.find(key) != dct.end()) {
+            dct[key] = dct[key] + "\n" + value;
+        } else {
+            dct[key] = value;
+        }
+
+        return kvlm_parse(raw, end + 1, dct);
+    }
+
+    string kvlm_serialize(const unordered_map<string, string>& kvlm) {
+        string ret = "";
+
+        // Output fields
+        for (const auto& pair : kvlm) {
+            // Skip the message itself
+            if (pair.first == "") continue;
+
+            // Normalize to a list
+            vector<string> val;
+            string valCopy = pair.second; // Make a copy to allow modification
+            if (valCopy.find("\n") != string::npos) {
+                size_t pos = 0;
+                while ((pos = valCopy.find("\n", pos)) != string::npos) {
+                    valCopy.replace(pos, 1, "\n ");
+                    pos += 2;
+                }
+            }
+            val.push_back(valCopy);
+
+            for (const auto& v : val) {
+                ret += pair.first + " " + v + "\n";
+            }
+        }
+
+        // Append message
+        ret += "\n" + kvlm.at("") + "\n";
+
+        return ret;
+    }
+
+
+    string GitCommit::serialize(GitRepo repo){
+        return kvlm_serialize(kvlm);
+    }
+
+    void GitCommit::deserialize(string data){
+        kvlm = kvlm_parse(data);
+    }
 
     string GitTag::serialize(GitRepo repo){}
 
@@ -181,7 +249,7 @@ namespace GitAne{
     GitObject& read_object(GitRepo repo, string sha) { // Essayer avec ça. Si ça marhe pas, las passer en void, la faire prendre un GitObject* et le set dedans. On peut faire une variable qui indique le type et très facilement vérifeir le type de la variable de retour avec un Switch.        /*
         /*
         * Entrée: un repo, un sha
-        * Sortie: l'objet associé (sous forme de GitBlob*)
+        * Sortie: l'objet associé (sous forme de GitObject*)
         */
         fs::path path = repo.get_gitdir() / "objects" / sha.substr(0, 2) / sha.substr(2, sha.size() - 2);
 
