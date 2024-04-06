@@ -37,12 +37,22 @@ namespace GitAne{
             cout << b.serialize(repo) << endl;
         }
 
+        void write_commit(vector<string> args){
+            GitRepo repo = repo_find("");
+            GitCommit c;
+            unordered_map<string, string> k = {{"caca" , args[0]},{"prout",args[1]}};
+            cout<<"ok"<<endl;
+            c.deserialize(kvlm_serialize(k));
+            write_to_git_object(repo,c);
+        }
+
 
         void debug_plugin_loader(){
             initPlugin("debug");
             addCommand("hash",&hash,"print the hash value of a specific file",1,1);
             addCommand("write_blob",&write_file,"writes file arg1 in .git folder as a blob",1,1);
             addCommand("read_blob",&read_object_fun,"reads blob with sha of args[0]",1,1);
+            addCommand("write_commit",&write_commit,"writes commit caca=args[0], prout=args[1]",2,2);
         }
     }
 

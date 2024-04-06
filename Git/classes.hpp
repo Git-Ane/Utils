@@ -73,7 +73,7 @@ namespace GitAne{
         string blobdata;
     };
 
-    unordered_map<string, string> kvlm_parse(const string& raw, size_t start = 0, unordered_map<string, string> dct = {});
+    unordered_map<string, string> kvlm_parse(const string& raw);
 
     string kvlm_serialize(const unordered_map<string, string>& kvlm);
 

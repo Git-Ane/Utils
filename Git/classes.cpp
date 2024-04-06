@@ -166,13 +166,19 @@ namespace GitAne{
         blobdata = data;
     }
 
-    unordered_map<string, string> kvlm_parse(const string& raw, size_t start, unordered_map<string, string> dct) {
+    unordered_map<string, string> kvlm_parse(const string& raw) {
+    unordered_map<string, string> dct;
+
+    size_t start = 0;
+
+    while (start < raw.size()) {
         size_t spc = raw.find(' ', start);
         size_t nl = raw.find('\n', start);
 
+        // Base case
         if (spc == string::npos || nl < spc) {
             dct[string()] = raw.substr(start + 1);
-            return dct;
+            break;
         }
 
         string key = raw.substr(start, spc - start);
@@ -180,10 +186,10 @@ namespace GitAne{
         size_t end = start;
         while (true) {
             end = raw.find('\n', end + 1);
-            if (raw[end + 1] != ' ') break;
+            if (raw[end + 1] != ' ' || end == string::npos) break;
         }
 
-        string value = raw.substr(spc + 1, end - spc - 1);
+        string value = raw.substr(spc + 1, (end != string::npos ? end : raw.size()) - spc - 1);
         size_t pos;
         while ((pos = value.find("\n ")) != string::npos) {
             value.replace(pos, 2, "\n");
@@ -195,8 +201,12 @@ namespace GitAne{
             dct[key] = value;
         }
 
-        return kvlm_parse(raw, end + 1, dct);
+        if (end == string::npos) break;
+        start = end + 1;
     }
+
+    return dct;
+}
 
     string kvlm_serialize(const unordered_map<string, string>& kvlm) {
         string ret = "";
@@ -223,12 +233,16 @@ namespace GitAne{
             }
         }
 
-        // Append message
-        ret += "\n" + kvlm.at("") + "\n";
+        // Append message if it exists
+        auto it = kvlm.find("");
+        if (it != kvlm.end()) {
+            ret += "\n" + it->second + "\n";
+        }
+
+        cout<< "serialized klvm into :" << endl << ret <<endl;
 
         return ret;
     }
-
 
     string GitCommit::serialize(GitRepo repo){
         return kvlm_serialize(kvlm);
