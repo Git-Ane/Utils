@@ -205,7 +205,7 @@ namespace GitAne{
     };
 
     bool write_to_git_object(GitRepo repo, GitObject&);
-
+    void write_commit(vector<string>);
     GitObject& read_object(GitRepo repo, string sha);
 
 
