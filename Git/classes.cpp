@@ -44,6 +44,8 @@ namespace GitAne{
         return GitRepo(path,false);
     }
 
+    
+
     GitRepo create_repo(fs::path path){
         GitRepo repo = GitRepo(path, true);
 
@@ -75,7 +77,8 @@ namespace GitAne{
         create_dir(repo.get_gitdir() / "refs");
         create_dir(repo.get_gitdir() / "refs/tags");
         create_dir(repo.get_gitdir() / "refs/heads");
-
+        create_dir(repo.get_gitdir() / "tracked"); // contient les fichiers à suivre par branche.
+        create_file(repo.get_gitdir() / "tracked" / "main"); // la branche par défaut
         ofstream conf = create_file(repo.get_gitdir() / "conf");
         conf << "# write what you want here, we will carefully ignore it.";
 
@@ -83,6 +86,81 @@ namespace GitAne{
         
 
         return repo;
+    }
+
+    void track_file(vector<string> args){
+        GitRepo repo = repo_find("");
+        fs::path path = repo.get_gitdir() / "tracked" / "main";  // TODO: changer le main par la branche active
+        std::ifstream fichier(path);
+        if (!fichier.is_open()) {
+            std::cerr << "Erreur: Impossible d'ouvrir le fichier " << path << std::endl;
+            return;
+        }
+
+        // Vérifier si le nom est déjà présent dans le fichier
+        std::string ligne;
+        while (std::getline(fichier, ligne)) {
+            if (ligne == args[0]) {
+                // Le nom est déjà présent, donc nous n'avons rien à faire
+                std::cout << "Le nom est déjà présent dans le fichier." << std::endl;
+                return;
+            }
+        }
+
+        // Le nom n'est pas présent, donc nous l'ajoutons à la fin du fichier
+        std::ofstream fichier_sortie(path, std::ios_base::app);
+        if (!fichier_sortie.is_open()) {
+            std::cerr << "Erreur: Impossible d'ouvrir le fichier en écriture." << std::endl;
+            return;
+        }
+
+        fichier_sortie << args[0] << std::endl;
+        std::cout << args[0] << " tracked successfuly.";
+        return;
+
+    }
+
+    void untrack_file(vector<string> args){
+        GitRepo repo = repo_find("");
+        fs::path path = repo.get_gitdir() / "tracked" / "main";  // TODO: changer le main par la branche active
+        std::ifstream fichier(path);
+        if (!fichier.is_open()) {
+            std::cerr << "Erreur: Impossible d'ouvrir le fichier " << path << std::endl;
+            return;
+        }
+
+        // Lire toutes les lignes du fichier dans un vecteur
+        std::vector<std::string> lignes;
+        std::string ligne;
+        while (std::getline(fichier, ligne)) {
+            lignes.push_back(ligne);
+        }
+
+        fichier.close();
+
+        // Reouvrir le fichier pour l'écriture
+        std::ofstream fichier_sortie(path);
+        if (!fichier_sortie.is_open()) {
+            std::cerr << "Erreur: Impossible d'ouvrir le fichier en écriture." << std::endl;
+            return;
+        }
+
+        // Parcourir le vecteur de lignes, écrire toutes les lignes sauf celle contenant le nom
+        bool nomTrouve = false;
+        for (const auto& l : lignes) {
+            if (l == args[0]) {
+                nomTrouve = true;
+            } else {
+                fichier_sortie << l << std::endl;
+            }
+        }
+
+        if (nomTrouve) {
+            std::cout << args[0] << " untracked successfuly.";
+            return;
+        } else {
+            std::cout << "Le nom n'a pas été trouvé dans le fichier." << std::endl;
+        }
     }
 
     
@@ -107,14 +185,13 @@ namespace GitAne{
         result.insert(result.end(), content.begin(), content.end());
 
         std::string resultString(result.begin(), result.end());
-        std::cout << "On obtient: " << resultString << std::endl;
         std::string hash = sha1(resultString);
 
         fs::path git_objects_folder = repo.get_gitdir() / "objects" / hash.substr(0, 2);
         if (fs::exists(git_objects_folder)) {
             if (fs::exists(git_objects_folder / hash.substr(2))) {
-                std::cerr << "COLLISION DE SHA, IMPOSSIBLE ?! NANI ! LA FIN DU MODNE ! LE BITCOIN S'EFFONDRE nfaie hffiezf";
-                return false;
+                std::cout << "File did not changed.";
+                return true;
             }
         } else {
             create_dir(git_objects_folder);
@@ -210,7 +287,6 @@ namespace GitAne{
 
     string kvlm_serialize(const unordered_map<string, string>& kvlm) {
         string ret = "";
-
         // Output fields
         for (const auto& pair : kvlm) {
             // Skip the message itself
@@ -239,7 +315,7 @@ namespace GitAne{
             ret += "\n" + it->second + "\n";
         }
 
-        cout<< "serialized klvm into :" << endl << ret <<endl;
+        // cout<< "serialized klvm into :" << endl << ret <<endl;
 
         return ret;
     }

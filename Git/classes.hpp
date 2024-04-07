@@ -39,6 +39,8 @@ namespace GitAne{
     GitRepo create_repo(fs::path);
     GitRepo repo_find(fs::path);
 
+    void track_file(vector<string> args);
+    void untrack_file(vector<string> args);
 
 
     class GitObject
