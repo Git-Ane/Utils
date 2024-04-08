@@ -225,10 +225,13 @@ namespace GitAne{
             for (std::string& element : result) {
                 cout << "Found " << element << endl;
                 std::vector<unsigned char> a_hash;
+                if(!fs::exists(element)){throw(logic_error("File "+element+" doesn't exist"));}
                 ifstream file(repo.get_gitdir() / ".." / element);
                 std::stringstream buffer;
                 buffer << file.rdbuf(); // Read the entire file into the stringstream buffer
                 std::string content = buffer.str();
+
+                cout << "Read file " << element << "content was : "<< endl << content << endl;
 
                 GitBlob a_ajouter(content);
                 a_ajouter.deserialize(content); // si on le met pas ça met 0, faut vraiment utiliser full fonctions quand on utilise des réfs ...
