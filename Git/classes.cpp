@@ -245,6 +245,24 @@ namespace GitAne{
             cout << "=== END COMMIT ===" << endl;
             
         }
+
+    void checkoutcommit(vector<string> args){
+        string sha = args[0];
+        GitRepo repo = repo_find("");
+        GitObject& c = read_object(repo,sha);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
+        unordered_map<string,string> k = kvlm_parse(c.serialize(repo));
+        for (auto& it: k) {
+            cout << "File " << it.first << endl;
+            GitObject& b = read_object(repo,it.second);
+            ofstream f(it.first);
+            f << b.serialize(repo);
+            f.close();
+        }
+
+    }
+
+
+
     GitObject::GitObject(string data){
         if(data!=""){
             //deserialize(data);
@@ -421,7 +439,13 @@ namespace GitAne{
             static GitBlob obj = GitBlob(content);
             obj.deserialize(content);
             return obj;
-        } else {
+        } 
+        else if(fmt == "commit"){
+            static GitCommit obj = GitCommit();
+            obj.deserialize(content);
+            return obj;
+        }
+        else {
             throw std::runtime_error("Unknown type " + fmt + " for object " + sha);
         }
         

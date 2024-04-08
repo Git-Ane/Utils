@@ -41,6 +41,7 @@ namespace GitAne{
 
     void track_file(vector<string> args);
     void untrack_file(vector<string> args);
+    void checkoutcommit(vector<string> args);
 
 
     class GitObject
@@ -91,7 +92,6 @@ namespace GitAne{
 
         void init();
 
-    private:
         unordered_map<string, string> kvlm;
     };
 
