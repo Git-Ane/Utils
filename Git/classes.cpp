@@ -165,7 +165,7 @@ namespace GitAne{
 
     
 
-    bool write_to_git_object(GitRepo repo, GitObject& obj) {
+    string write_to_git_object(GitRepo repo, GitObject& obj) {
         /*
         * Entrée: Réf d'un GitObj
         * Sortie: True si on a pu l'écrire à l'URL donnée par le SHA
@@ -191,7 +191,7 @@ namespace GitAne{
         if (fs::exists(git_objects_folder)) {
             if (fs::exists(git_objects_folder / hash.substr(2))) {
                 std::cout << "File did not changed.";
-                return true;
+                return hash;
             }
         } else {
             create_dir(git_objects_folder);
@@ -199,7 +199,7 @@ namespace GitAne{
         ofstream f = create_file(git_objects_folder / hash.substr(2));
         f << resultString; // Write the data to file
         f.close();
-        return true;
+        return hash;
     }
 
     void write_commit(vector<string> args){
@@ -229,21 +229,11 @@ namespace GitAne{
                 std::stringstream buffer;
                 buffer << file.rdbuf(); // Read the entire file into the stringstream buffer
                 std::string content = buffer.str();
-                string fmt = "blob";
 
-                a_hash.insert(a_hash.end(), fmt.begin(), fmt.end());
-                a_hash.push_back(' '); // Space character
-                std::string lenStr = std::to_string(content.length());
-                a_hash.insert(a_hash.end(), lenStr.begin(), lenStr.end());
-                a_hash.push_back('\0'); // Null character
-                a_hash.insert(a_hash.end(), content.begin(), content.end());
-                std::string str_a_hash(a_hash.begin(),a_hash.end());
-                std::string res_sha = GitAne::sha1(str_a_hash);
-                cout << "    Hashed into: " << str_a_hash << endl;
+                GitBlob a_ajouter(content);
+                a_ajouter.deserialize(content); // si on le met pas ça met 0, faut vraiment utiliser full fonctions quand on utilise des réfs ...
+                string res_sha =  write_to_git_object(repo,a_ajouter);
                 k.insert(std::make_pair(element, res_sha));
-                GitBlob a_ajouter(str_a_hash);
-                a_ajouter.deserialize(str_a_hash); // si on le met pas ça met 0, faut vraiment utiliser full fonctions quand on utilise des réfs ...
-                write_to_git_object(repo,a_ajouter);
             }
             cout<<"Explored all files to add."<<endl;
             cout << "Writting the commit..." << endl;
