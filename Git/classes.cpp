@@ -72,6 +72,10 @@ namespace GitAne{
         head << "none";
         head.close();
 
+        ofstream active_branch_file = create_file(repo.get_gitdir() / "active_branch");
+        active_branch_file << "main";
+        active_branch_file.close();
+
         create_file(repo.get_gitdir() / "branches");
         create_dir(repo.get_gitdir() / "objects");
         create_dir(repo.get_gitdir() / "refs");
@@ -225,8 +229,14 @@ namespace GitAne{
     void write_commit(vector<string> args){
             GitRepo repo = repo_find("");
             GitCommit c;
+            unordered_map<string,string> branches = get_branches(repo);
             string sha_head = get_head(repo);
             vector<string> result = get_tracked_files(repo);
+
+            if(branches[get_active_branch(repo)]!=sha_head && sha_head != "none"){
+                throw(logic_error("Can't commit in detached Head mode"));
+            }
+
             
             
             unordered_map<string, string> k;
@@ -256,18 +266,12 @@ namespace GitAne{
             string sha = write_to_git_object(repo,c);
             cout << "Changing HEAD..." << endl;
             set_head(repo,sha);
-            if(sha_head == "none"){
-                ofstream branch_file(repo.get_gitdir() / "branches");
-                branch_file << "main " << sha;
-                branch_file.close();
-            }
-            else{
-                unordered_map<string,string> branches = get_branches(repo);
-                branches["main"] = sha;
-                ofstream branch_file(repo.get_gitdir() / "branches");
-                branch_file << kvlm_serialize(branches);
-                branch_file.close();
-            }
+
+            branches[get_active_branch(repo)] = sha;
+            ofstream branch_file(repo.get_gitdir() / "branches");
+            branch_file << kvlm_serialize(branches);
+            branch_file.close();
+
             cout << "=== END COMMIT ===" << endl;
             
         }
@@ -301,6 +305,7 @@ namespace GitAne{
         }
         else{
             unordered_map<string,string> branches = get_branches(repo);
+            set_active_branch(repo,args[0]);
             sha = branches[args[0]];
         }
         vector<string> tracked = get_tracked_files(repo);
@@ -349,6 +354,21 @@ namespace GitAne{
     void set_head(GitRepo repo, string sha){
         ofstream headfile(repo.get_gitdir() / "HEAD");
         headfile << sha;
+        headfile.close();
+    }
+
+    string get_active_branch(GitRepo repo){
+        ifstream file(repo.get_gitdir() / "active_branch");
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        string content = buffer.str();
+        file.close();
+        return content;
+    }
+
+    void set_active_branch(GitRepo repo, string branch){
+        ofstream headfile(repo.get_gitdir() / "active_branch");
+        headfile << branch;
         headfile.close();
     }
 
