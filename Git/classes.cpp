@@ -242,7 +242,11 @@ namespace GitAne{
             cout<<"Explored all files to add."<<endl;
             cout << "Writting the commit..." << endl;
             c.deserialize(kvlm_serialize(k));
-            write_to_git_object(repo,c);
+            string sha = write_to_git_object(repo,c);
+            cout << "Changing HEAD..." << endl;
+            ofstream headfile(repo.get_gitdir() / "HEAD");
+            headfile << sha;
+            headfile.close();
             cout << "=== END COMMIT ===" << endl;
             
         }
