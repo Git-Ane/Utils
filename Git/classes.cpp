@@ -96,7 +96,7 @@ namespace GitAne{
         fs::path path = repo.get_gitdir() / "tracked" / "main";  // TODO: changer le main par la branche active
         std::ifstream fichier(path);
         if (!fichier.is_open()) {
-            std::cerr << "Erreur: Impossible d'ouvrir le fichier " << path << std::endl;
+            std::cerr << "Error : can't open file " << path << std::endl;
             return;
         }
 
@@ -105,7 +105,7 @@ namespace GitAne{
         while (std::getline(fichier, ligne)) {
             if (ligne == args[0]) {
                 // Le nom est déjà présent, donc nous n'avons rien à faire
-                std::cout << "Le nom est déjà présent dans le fichier." << std::endl;
+                std::cout << "File " << args[0] << " is already tracked" << std::endl;
                 return;
             }
         }
@@ -113,7 +113,7 @@ namespace GitAne{
         // Le nom n'est pas présent, donc nous l'ajoutons à la fin du fichier
         std::ofstream fichier_sortie(path, std::ios_base::app);
         if (!fichier_sortie.is_open()) {
-            std::cerr << "Erreur: Impossible d'ouvrir le fichier en écriture." << std::endl;
+            std::cerr << "Error : can't write in file " << path << std::endl;
             return;
         }
 
@@ -144,7 +144,7 @@ namespace GitAne{
         // Reouvrir le fichier pour l'écriture
         std::ofstream fichier_sortie(path);
         if (!fichier_sortie.is_open()) {
-            std::cerr << "Erreur: Impossible d'ouvrir le fichier en écriture." << std::endl;
+            std::cerr << "Error : can't write in file " << path << std::endl;
             return;
         }
 
@@ -162,7 +162,7 @@ namespace GitAne{
             std::cout << args[0] << " untracked successfuly." << endl;
             return;
         } else {
-            std::cout << "Le nom n'a pas été trouvé dans le fichier." << std::endl;
+            std::cout << "File " << args[0] << " is not tracked" << std::endl;
         }
     }
 
