@@ -42,6 +42,9 @@ namespace GitAne{
     void track_file(vector<string> args);
     void untrack_file(vector<string> args);
     void checkoutcommit(vector<string> args);
+    string get_head(GitRepo repo);
+    void set_head(GitRepo repo, string sha);
+    string get_parent(GitRepo repo, string sha);
 
 
     class GitObject

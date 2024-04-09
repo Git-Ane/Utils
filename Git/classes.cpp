@@ -69,7 +69,7 @@ namespace GitAne{
         descr.close();
 
         ofstream head = create_file(repo.get_gitdir() / "HEAD");
-        head << "ref: refs/heads/master"; // jsp ce que ça veut dire lol
+        head << "none";
         head.close();
 
         create_dir(repo.get_gitdir() / "branches");
@@ -90,6 +90,9 @@ namespace GitAne{
 
     void track_file(vector<string> args){
         GitRepo repo = repo_find("");
+        if(!fs::exists(args[0])){
+            throw(invalid_argument("File " + args[0] + " doesn't exist"));
+        }
         fs::path path = repo.get_gitdir() / "tracked" / "main";  // TODO: changer le main par la branche active
         std::ifstream fichier(path);
         if (!fichier.is_open()) {
@@ -163,6 +166,7 @@ namespace GitAne{
         }
     }
 
+
     
 
     string write_to_git_object(GitRepo repo, GitObject& obj) {
@@ -208,6 +212,8 @@ namespace GitAne{
             
             std::vector<std::string> result;
 
+            string sha_head = get_head(repo);
+
             std::ifstream fichier(repo.get_gitdir() / "tracked" / "main");
             if (!fichier.is_open()) {
                 std::cerr << "Error: Can not open tracked files' file." << std::endl;
@@ -221,6 +227,7 @@ namespace GitAne{
             fichier.close();
             unordered_map<string, string> k;
             k.insert(make_pair("#name",args[0]));
+            k.insert(make_pair("#parent",sha_head));
             
             cout << "=== START COMMIT ===" << endl;
             for (std::string& element : result) {
@@ -244,16 +251,29 @@ namespace GitAne{
             c.deserialize(kvlm_serialize(k));
             string sha = write_to_git_object(repo,c);
             cout << "Changing HEAD..." << endl;
-            ofstream headfile(repo.get_gitdir() / "HEAD");
-            headfile << sha;
-            headfile.close();
+            set_head(repo,sha);
             cout << "=== END COMMIT ===" << endl;
             
         }
 
     void checkoutcommit(vector<string> args){
-        string sha = args[0];
         GitRepo repo = repo_find("");
+        string sha;
+        if(args[0]=="HEAD"){
+            cout << "You are already at head" << endl;
+            return;
+        }
+        else if(args[0].substr(0,5)=="HEAD-"){
+            cout << args[0].substr(5,args[0].size()-5) << endl;
+            int i = stoi(args[0].substr(5,args[0].size()-5));
+            sha = get_head(repo);
+            for (int a=0;a<i;a++){
+                sha = get_parent(repo,sha);
+            }
+        }
+        else{
+            throw(invalid_argument("not a valid position"));
+        }
         GitObject& c = read_object(repo,sha);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
         unordered_map<string,string> k = kvlm_parse(c.serialize(repo));
         string name = k["#name"];
@@ -267,10 +287,33 @@ namespace GitAne{
                 f.close();
             }
         }
+        set_head(repo,sha);
         cout << "=== END CHECKOUT COMMIT " + name + " ===" <<endl;
 
     }
 
+    string get_head(GitRepo repo){
+        ifstream file(repo.get_gitdir() / "HEAD");
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        string content = buffer.str();
+        file.close();
+        return content;
+    }
+
+    void set_head(GitRepo repo, string sha){
+        ofstream headfile(repo.get_gitdir() / "HEAD");
+        headfile << sha;
+        headfile.close();
+    }
+
+    string get_parent(GitRepo repo, string sha){
+        GitObject& c = read_object(repo,sha);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
+        unordered_map<string,string> k = kvlm_parse(c.serialize(repo));
+        string parent_sha = k["#parent"];
+        if(parent_sha == "none"){throw invalid_argument("You went too far back in the genealogy");}
+        return parent_sha;
+    }
 
 
     GitObject::GitObject(string data){

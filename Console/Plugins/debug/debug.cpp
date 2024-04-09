@@ -38,6 +38,11 @@ namespace GitAne{
             cout << b.serialize(repo) << endl;
         }
 
+        void head_sha(vector<string> args){
+            GitRepo repo = repo_find("");
+            cout << get_head(repo) << endl;
+        }
+
 
 
         void debug_plugin_loader(){
@@ -45,6 +50,7 @@ namespace GitAne{
             addCommand("hash",&hash,"print the hash value of a specific file",1,1);
             addCommand("write_blob",&write_file,"writes file arg1 in .git folder as a blob",1,1);
             addCommand("read_blob",&read_object_fun,"reads blob with sha of args[0]",1,1);
+            addCommand("get_head_sha",&head_sha,"get sha of head",0,0);
         }
     }
 
