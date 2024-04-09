@@ -89,11 +89,10 @@ int main(int argc, char* argv[]) {
     initPlugin("std");
     addCommand("help",&std_helpmsg,"Help message about std plugin",0,0);
     addCommand("hello",&sayHello,"says hello :)",0,0); 
-    addCommand("concatenate",&concatenate,"concatenates arg1 and arg2 (returns arg1 if only 1 argument)",1,2); 
     addCommand("init",&repo_init,"inits the current repository to be a Gitane repository",0,0);
     addCommand("untrack",&untrack_file,"untrack arg1 for the active branch",1,1);
     addCommand("track",&track_file,"track arg1 for the active branch",1,1);
-    addCommand("commit",&write_commit,"commit the tracked files.",0,0);
+    addCommand("commit",&write_commit,"commit the tracked files and name the commit arg1",1,1);
     addCommand("checkout_commit",&checkoutcommit,"check out the commit whcih sha is arg1",1,1);
     plugin_loader();
 

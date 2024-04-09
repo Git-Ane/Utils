@@ -115,7 +115,7 @@ namespace GitAne{
         }
 
         fichier_sortie << args[0] << std::endl;
-        std::cout << args[0] << " tracked successfuly.";
+        std::cout << args[0] << " tracked successfuly." << endl;
         return;
 
     }
@@ -156,7 +156,7 @@ namespace GitAne{
         }
 
         if (nomTrouve) {
-            std::cout << args[0] << " untracked successfuly.";
+            std::cout << args[0] << " untracked successfuly." << endl;
             return;
         } else {
             std::cout << "Le nom n'a pas été trouvé dans le fichier." << std::endl;
@@ -220,6 +220,7 @@ namespace GitAne{
             }
             fichier.close();
             unordered_map<string, string> k;
+            k.insert(make_pair("#name",args[0]));
             
             cout << "=== START COMMIT ===" << endl;
             for (std::string& element : result) {
@@ -231,7 +232,7 @@ namespace GitAne{
                 buffer << file.rdbuf(); // Read the entire file into the stringstream buffer
                 std::string content = buffer.str();
 
-                cout << "Read file " << element << "content was : "<< endl << content << endl;
+                cout << "Read file " << element << " content was : "<< endl << content << endl;
 
                 GitBlob a_ajouter(content);
                 a_ajouter.deserialize(content); // si on le met pas ça met 0, faut vraiment utiliser full fonctions quand on utilise des réfs ...
@@ -251,13 +252,18 @@ namespace GitAne{
         GitRepo repo = repo_find("");
         GitObject& c = read_object(repo,sha);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
         unordered_map<string,string> k = kvlm_parse(c.serialize(repo));
+        string name = k["#name"];
+        cout << "=== START CHECKOUT COMMIT " + name + " ===" <<endl;
         for (auto& it: k) {
             cout << "File " << it.first << endl;
-            GitObject& b = read_object(repo,it.second);
-            ofstream f(it.first);
-            f << b.serialize(repo);
-            f.close();
+            if(it.first[0]!='#'){
+                GitObject& b = read_object(repo,it.second);
+                ofstream f(it.first);
+                f << b.serialize(repo);
+                f.close();
+            }
         }
+        cout << "=== END CHECKOUT COMMIT " + name + " ===" <<endl;
 
     }
 
