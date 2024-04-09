@@ -14,6 +14,7 @@
 #include <openssl/sha.h>
 #include <zlib.h>
 #include <unordered_map>
+#include <set>
 namespace fs = std::filesystem;
 
 using namespace std;
@@ -41,6 +42,7 @@ namespace GitAne{
 
     void track_file(vector<string> args);
     void untrack_file(vector<string> args);
+    vector<string> get_tracked_files(GitRepo repo);
     void checkoutcommit(vector<string> args);
     string get_head(GitRepo repo);
     void set_head(GitRepo repo, string sha);

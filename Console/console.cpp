@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
     addCommand("untrack",&untrack_file,"untrack arg1 for the active branch",1,1);
     addCommand("track",&track_file,"track arg1 for the active branch",1,1);
     addCommand("commit",&write_commit,"commit the tracked files and name the commit arg1",1,1);
-    addCommand("checkout_commit",&checkoutcommit,"check out the commit whcih sha is arg1",1,1);
+    addCommand("checkout",&checkoutcommit,"check out the commit arg1",1,1);
     plugin_loader();
 
     unsigned int i; 

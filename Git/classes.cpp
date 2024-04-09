@@ -77,8 +77,7 @@ namespace GitAne{
         create_dir(repo.get_gitdir() / "refs");
         create_dir(repo.get_gitdir() / "refs/tags");
         create_dir(repo.get_gitdir() / "refs/heads");
-        create_dir(repo.get_gitdir() / "tracked"); // contient les fichiers à suivre par branche.
-        create_file(repo.get_gitdir() / "tracked" / "main"); // la branche par défaut
+        create_file(repo.get_gitdir() / "tracked"); 
         ofstream conf = create_file(repo.get_gitdir() / "conf");
         conf << "# write what you want here, we will carefully ignore it.";
 
@@ -93,7 +92,7 @@ namespace GitAne{
         if(!fs::exists(args[0])){
             throw(invalid_argument("File " + args[0] + " doesn't exist"));
         }
-        fs::path path = repo.get_gitdir() / "tracked" / "main";  // TODO: changer le main par la branche active
+        fs::path path = repo.get_gitdir() / "tracked"; 
         std::ifstream fichier(path);
         if (!fichier.is_open()) {
             std::cerr << "Error : can't open file " << path << std::endl;
@@ -125,7 +124,7 @@ namespace GitAne{
 
     void untrack_file(vector<string> args){
         GitRepo repo = repo_find("");
-        fs::path path = repo.get_gitdir() / "tracked" / "main";  // TODO: changer le main par la branche active
+        fs::path path = repo.get_gitdir() / "tracked";  // TODO: changer le main par la branche active
         std::ifstream fichier(path);
         if (!fichier.is_open()) {
             std::cerr << "Erreur: Impossible d'ouvrir le fichier " << path << std::endl;
@@ -206,25 +205,30 @@ namespace GitAne{
         return hash;
     }
 
+    vector<string> get_tracked_files(GitRepo repo){
+        std::vector<std::string> result;
+
+
+        std::ifstream fichier(repo.get_gitdir() / "tracked");
+        if (!fichier.is_open()) {
+            throw(invalid_argument("Error: Can not open tracked files' file." ));
+        }
+
+        std::string ligne;
+        while (std::getline(fichier, ligne)) {
+            result.push_back(ligne);
+        }
+        fichier.close();
+        return result;
+    }
+
     void write_commit(vector<string> args){
             GitRepo repo = repo_find("");
             GitCommit c;
-            
-            std::vector<std::string> result;
-
             string sha_head = get_head(repo);
-
-            std::ifstream fichier(repo.get_gitdir() / "tracked" / "main");
-            if (!fichier.is_open()) {
-                std::cerr << "Error: Can not open tracked files' file." << std::endl;
-                return;
-            }
-
-            std::string ligne;
-            while (std::getline(fichier, ligne)) {
-                result.push_back(ligne);
-            }
-            fichier.close();
+            vector<string> result = get_tracked_files(repo);
+            
+            
             unordered_map<string, string> k;
             k.insert(make_pair("#name",args[0]));
             k.insert(make_pair("#parent",sha_head));
@@ -274,8 +278,12 @@ namespace GitAne{
         else{
             throw(invalid_argument("not a valid position"));
         }
+        vector<string> tracked = get_tracked_files(repo);
+        ofstream tracks_file(repo.get_gitdir() / "tracked");
+        tracks_file.close();
         GitObject& c = read_object(repo,sha);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
         unordered_map<string,string> k = kvlm_parse(c.serialize(repo));
+        set<string> still_exist;
         string name = k["#name"];
         cout << "=== START CHECKOUT COMMIT " + name + " ===" <<endl;
         for (auto& it: k) {
@@ -285,6 +293,18 @@ namespace GitAne{
                 ofstream f(it.first);
                 f << b.serialize(repo);
                 f.close();
+                vector<string> args;
+                args.push_back(it.first);
+                track_file(args);
+                still_exist.insert(it.first);
+            }
+        }
+        for (string& element : tracked){
+            if (still_exist.find(element) == still_exist.end()){
+                cout << "File " << element << " doesn't exist" << endl << "Do you want to remove it ? [y/n] ";
+                string rep;
+                cin>>rep;
+                if(rep=="y"){fs::remove(element);}
             }
         }
         set_head(repo,sha);
