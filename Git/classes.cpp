@@ -72,7 +72,7 @@ namespace GitAne{
         head << "none";
         head.close();
 
-        create_dir(repo.get_gitdir() / "branches");
+        create_file(repo.get_gitdir() / "branches");
         create_dir(repo.get_gitdir() / "objects");
         create_dir(repo.get_gitdir() / "refs");
         create_dir(repo.get_gitdir() / "refs/tags");
@@ -171,7 +171,7 @@ namespace GitAne{
     string write_to_git_object(GitRepo repo, GitObject& obj) {
         /*
         * Entrée: Réf d'un GitObj
-        * Sortie: True si on a pu l'écrire à l'URL donnée par le SHA
+        * Sortie: le sha
         */
         // Normalement ça marche et c'est polymorphe. On utilise le fait que la référence va permettre au compilo de savoir quelle variable "fmt" chercher
         // de même pour serialize.
@@ -256,9 +256,33 @@ namespace GitAne{
             string sha = write_to_git_object(repo,c);
             cout << "Changing HEAD..." << endl;
             set_head(repo,sha);
+            if(sha_head == "none"){
+                ofstream branch_file(repo.get_gitdir() / "branches");
+                branch_file << "main " << sha;
+                branch_file.close();
+            }
+            else{
+                unordered_map<string,string> branches = get_branches(repo);
+                branches["main"] = sha;
+                ofstream branch_file(repo.get_gitdir() / "branches");
+                branch_file << kvlm_serialize(branches);
+                branch_file.close();
+            }
             cout << "=== END COMMIT ===" << endl;
             
         }
+
+    string get_file_content(fs::path path){
+        ifstream file(path);
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        string content = buffer.str();
+        return content;
+    }
+
+    unordered_map<string,string> get_branches(GitRepo repo){
+        return kvlm_parse(get_file_content(repo.get_gitdir() / "branches"));
+    }
 
     void checkoutcommit(vector<string> args){
         GitRepo repo = repo_find("");
@@ -276,7 +300,8 @@ namespace GitAne{
             }
         }
         else{
-            throw(invalid_argument("not a valid position"));
+            unordered_map<string,string> branches = get_branches(repo);
+            sha = branches[args[0]];
         }
         vector<string> tracked = get_tracked_files(repo);
         ofstream tracks_file(repo.get_gitdir() / "tracked");

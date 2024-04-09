@@ -47,6 +47,8 @@ namespace GitAne{
     string get_head(GitRepo repo);
     void set_head(GitRepo repo, string sha);
     string get_parent(GitRepo repo, string sha);
+    unordered_map<string,string> get_branches(GitRepo repo);
+    string get_file_content(fs::path path);
 
 
     class GitObject
