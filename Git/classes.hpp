@@ -51,6 +51,7 @@ namespace GitAne{
     string get_file_content(fs::path path);
     string get_active_branch(GitRepo repo);
     void set_active_branch(GitRepo repo, string branch);
+    void create_branch(vector<string> args);
 
 
     class GitObject

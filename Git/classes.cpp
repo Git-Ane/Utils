@@ -380,6 +380,22 @@ namespace GitAne{
         return parent_sha;
     }
 
+    void create_branch(vector<string> args){
+        string name = args[0];
+        GitRepo repo = repo_find("");
+        string sha = get_head(repo);
+        unordered_map<string,string> branches = get_branches(repo);
+        if(branches.find(name) != branches.end()){
+            throw(invalid_argument("Branch " + name + " already exists"));
+        }
+        branches[name] = sha;
+        set_active_branch(repo,name);
+        ofstream branch_file(repo.get_gitdir() / "branches");
+        branch_file << kvlm_serialize(branches);
+        branch_file.close();
+
+    }
+
 
     GitObject::GitObject(string data){
         if(data!=""){
