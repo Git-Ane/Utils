@@ -52,6 +52,7 @@ namespace GitAne{
     string get_active_branch(GitRepo repo);
     void set_active_branch(GitRepo repo, string branch);
     void create_branch(vector<string> args);
+    string sha_of_position(GitRepo repo,string pos);
 
 
     class GitObject

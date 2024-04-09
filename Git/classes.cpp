@@ -209,6 +209,9 @@ namespace GitAne{
         return hash;
     }
 
+
+    /*! \brief get le vector des fichiers tracked 
+    */
     vector<string> get_tracked_files(GitRepo repo){
         std::vector<std::string> result;
 
@@ -276,6 +279,9 @@ namespace GitAne{
             
         }
 
+
+    /*! \brief T'as vraiment besoin d'une desciption mdr ?
+    */
     string get_file_content(fs::path path){
         ifstream file(path);
         std::stringstream buffer;
@@ -284,29 +290,19 @@ namespace GitAne{
         return content;
     }
 
+
+    /*! \brief get le dico des branches (associe a chaque branche le sha du commit le plus recent de la branche)
+        */
     unordered_map<string,string> get_branches(GitRepo repo){
         return kvlm_parse(get_file_content(repo.get_gitdir() / "branches"));
     }
 
     void checkoutcommit(vector<string> args){
         GitRepo repo = repo_find("");
-        string sha;
+        string sha = sha_of_position(repo,args[0]);
         if(args[0]=="HEAD"){
             cout << "You are already at head" << endl;
             return;
-        }
-        else if(args[0].substr(0,5)=="HEAD-"){
-            cout << args[0].substr(5,args[0].size()-5) << endl;
-            int i = stoi(args[0].substr(5,args[0].size()-5));
-            sha = get_head(repo);
-            for (int a=0;a<i;a++){
-                sha = get_parent(repo,sha);
-            }
-        }
-        else{
-            unordered_map<string,string> branches = get_branches(repo);
-            set_active_branch(repo,args[0]);
-            sha = branches[args[0]];
         }
         vector<string> tracked = get_tracked_files(repo);
         ofstream tracks_file(repo.get_gitdir() / "tracked");
@@ -329,9 +325,10 @@ namespace GitAne{
                 still_exist.insert(it.first);
             }
         }
-        for (string& element : tracked){
+        for (string& element : tracked){    //les fichiers qui sont suivis mais pas dans le commit ou on checkout on les supprime
             if (still_exist.find(element) == still_exist.end()){
-                cout << "File " << element << " doesn't exist" << endl << "Do you want to remove it ? [y/n] ";
+                cout << "File " << element << " doesn't exist" << endl << "Do you want to remove it ? [y/n] "; 
+                //je demande mais on va pt enlever ca en vrai
                 string rep;
                 cin>>rep;
                 if(rep=="y"){fs::remove(element);}
@@ -342,6 +339,34 @@ namespace GitAne{
 
     }
 
+
+    /*! \brief get le sha d'une position ecrite comprehensiblement (genre HEAD-2 ou main)
+    */
+    string sha_of_position(GitRepo repo,string pos){
+        string sha;
+        if(pos=="HEAD"){
+            cout << "You are already at head" << endl;
+            return get_head(repo);
+        }
+        else if(pos.substr(0,5)=="HEAD-"){
+            cout << pos.substr(5,pos.size()-5) << endl;
+            int i = stoi(pos.substr(5,pos.size()-5));
+            sha = get_head(repo);
+            for (int a=0;a<i;a++){
+                sha = get_parent(repo,sha);
+            }
+        }
+        else{
+            unordered_map<string,string> branches = get_branches(repo);
+            set_active_branch(repo,pos);
+            sha = branches[pos];
+        }
+        return sha;
+    }
+
+
+    /*! \brief get the sha of head
+    */
     string get_head(GitRepo repo){
         ifstream file(repo.get_gitdir() / "HEAD");
         std::stringstream buffer;
@@ -351,12 +376,18 @@ namespace GitAne{
         return content;
     }
 
+
+    /*! \brief set the head to the commit of sha sha
+    */
     void set_head(GitRepo repo, string sha){
         ofstream headfile(repo.get_gitdir() / "HEAD");
         headfile << sha;
         headfile.close();
     }
 
+
+    /*! \brief get the active_branch
+    */
     string get_active_branch(GitRepo repo){
         ifstream file(repo.get_gitdir() / "active_branch");
         std::stringstream buffer;
@@ -366,12 +397,17 @@ namespace GitAne{
         return content;
     }
 
+
+    /*! \brief set the active_branch to branch
+    */
     void set_active_branch(GitRepo repo, string branch){
         ofstream headfile(repo.get_gitdir() / "active_branch");
         headfile << branch;
         headfile.close();
     }
 
+    /*! \brief get the parent of commit with sha sha
+    */
     string get_parent(GitRepo repo, string sha){
         GitObject& c = read_object(repo,sha);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
         unordered_map<string,string> k = kvlm_parse(c.serialize(repo));
