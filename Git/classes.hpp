@@ -44,7 +44,7 @@ namespace GitAne{
     void untrack_file(vector<string> args);
     vector<string> get_tracked_files(GitRepo repo);
     void checkoutcommit(vector<string> args);
-    string get_head(GitRepo repo);
+    string get_head(GitRepo repo, bool ignore_temporary);
     void set_head(GitRepo repo, string sha);
     string get_parent(GitRepo repo, string sha);
     unordered_map<string,string> get_branches(GitRepo repo);
@@ -216,7 +216,7 @@ namespace GitAne{
     };
 
     string write_to_git_object(GitRepo repo, GitObject&);
-    void write_commit(vector<string>);
+    void write_commit(string name, bool temporary);
     GitObject& read_object(GitRepo repo, string sha);
 
 

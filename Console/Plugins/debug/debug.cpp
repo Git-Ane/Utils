@@ -40,7 +40,7 @@ namespace GitAne{
 
         void head_sha(vector<string> args){
             GitRepo repo = repo_find("");
-            cout << get_head(repo) << endl;
+            cout << get_head(repo,true) << endl;
         }
 
 

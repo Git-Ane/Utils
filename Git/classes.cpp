@@ -229,22 +229,24 @@ namespace GitAne{
         return result;
     }
 
-    void write_commit(vector<string> args){
+    void write_commit(string name, bool temporary){
             GitRepo repo = repo_find("");
             GitCommit c;
             unordered_map<string,string> branches = get_branches(repo);
-            string sha_head = get_head(repo);
+            string sha_head = get_head(repo,true);
             vector<string> result = get_tracked_files(repo);
 
-            if(branches[get_active_branch(repo)]!=sha_head && sha_head != "none"){
+            if(branches[get_active_branch(repo)]!=get_head(repo,false) && sha_head != "none"){
                 throw(logic_error("Can't commit in detached Head mode"));
             }
 
             
             
             unordered_map<string, string> k;
-            k.insert(make_pair("#name",args[0]));
+            k.insert(make_pair("#name",name));
             k.insert(make_pair("#parent",sha_head));
+            if(temporary){k["#temporary"] = "true";}
+            else{k["#temporary"] = "false";}
             
             cout << "=== START COMMIT ===" << endl;
             for (std::string& element : result) {
@@ -300,10 +302,14 @@ namespace GitAne{
     void checkoutcommit(vector<string> args){
         GitRepo repo = repo_find("");
         string sha = sha_of_position(repo,args[0]);
-        if(args[0]=="HEAD"){
+        string sha_head = get_head(repo,false);
+        if(sha_head == sha){
             cout << "You are already at head" << endl;
             return;
         }
+        unordered_map<string,string> branches = get_branches(repo);
+        if(!(branches[get_active_branch(repo)]!=sha_head && sha_head != "none")){write_commit("temporary_commit",true);}
+        else{cout<< "No temporary commit was made, because of detached HEAD mode" <<endl << branches[get_active_branch(repo)] << " " << sha_head << endl;}
         vector<string> tracked = get_tracked_files(repo);
         ofstream tracks_file(repo.get_gitdir() / "tracked");
         tracks_file.close();
@@ -335,6 +341,7 @@ namespace GitAne{
             }
         }
         set_head(repo,sha);
+        if(args[0].substr(0,4)!="HEAD"){set_active_branch(repo,args[0]);}
         cout << "=== END CHECKOUT COMMIT " + name + " ===" <<endl;
 
     }
@@ -345,20 +352,18 @@ namespace GitAne{
     string sha_of_position(GitRepo repo,string pos){
         string sha;
         if(pos=="HEAD"){
-            cout << "You are already at head" << endl;
-            return get_head(repo);
+            return get_head(repo,true);
         }
         else if(pos.substr(0,5)=="HEAD-"){
             cout << pos.substr(5,pos.size()-5) << endl;
             int i = stoi(pos.substr(5,pos.size()-5));
-            sha = get_head(repo);
+            sha = get_head(repo,false);
             for (int a=0;a<i;a++){
                 sha = get_parent(repo,sha);
             }
         }
         else{
             unordered_map<string,string> branches = get_branches(repo);
-            set_active_branch(repo,pos);
             sha = branches[pos];
         }
         return sha;
@@ -367,12 +372,17 @@ namespace GitAne{
 
     /*! \brief get the sha of head
     */
-    string get_head(GitRepo repo){
+    string get_head(GitRepo repo, bool ignore_temporary){
         ifstream file(repo.get_gitdir() / "HEAD");
         std::stringstream buffer;
         buffer << file.rdbuf();
         string content = buffer.str();
         file.close();
+        if(ignore_temporary && content != "none"){
+            GitObject& c = read_object(repo,content);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
+            unordered_map<string,string> k = kvlm_parse(c.serialize(repo));
+            if(k["#temporary"]=="true"){content = k["#parent"];}        //c moins propre pour le code que faire get_parent mais ca va plus vite
+        }
         return content;
     }
 
@@ -419,7 +429,7 @@ namespace GitAne{
     void create_branch(vector<string> args){
         string name = args[0];
         GitRepo repo = repo_find("");
-        string sha = get_head(repo);
+        string sha = get_head(repo,true);
         unordered_map<string,string> branches = get_branches(repo);
         if(branches.find(name) != branches.end()){
             throw(invalid_argument("Branch " + name + " already exists"));
