@@ -239,8 +239,6 @@ namespace GitAne{
             if(branches[get_active_branch(repo)]!=get_head(repo,false) && sha_head != "none"){
                 throw(logic_error("Can't commit in detached Head mode"));
             }
-
-            
             
             unordered_map<string, string> k;
             k.insert(make_pair("#name",name));
@@ -360,6 +358,7 @@ namespace GitAne{
             sha = get_head(repo,false);
             for (int a=0;a<i;a++){
                 sha = get_parent(repo,sha);
+                if(sha=="none"){throw(invalid_argument("You went too far back"));}
             }
         }
         else{
@@ -367,6 +366,21 @@ namespace GitAne{
             sha = branches[pos];
         }
         return sha;
+    }
+
+    void show_history(vector<string> args){
+        GitRepo repo = repo_find("");
+        string sha = get_head(repo,true);
+        vector<string> names;
+        while(sha!="none"){
+            names.push_back(open_commit(repo,sha)["#name"]);
+            sha = get_parent(repo,sha);
+        }
+        cout << endl << "=== BEGIN HISTORY ===" << endl;
+        for(int i = names.size()-1;i>=0;i--){
+            cout << names[i] << endl;
+        }
+        cout << endl << "=== END HISTORY ===" << endl;
     }
 
 
@@ -384,6 +398,12 @@ namespace GitAne{
             if(k["#temporary"]=="true"){content = k["#parent"];}        //c moins propre pour le code que faire get_parent mais ca va plus vite
         }
         return content;
+    }
+
+    unordered_map<string,string> open_commit(GitRepo repo, string sha){
+        GitObject& c = read_object(repo,sha);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
+        unordered_map<string,string> k = kvlm_parse(c.serialize(repo));
+        return k;
     }
 
 
@@ -422,7 +442,6 @@ namespace GitAne{
         GitObject& c = read_object(repo,sha);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
         unordered_map<string,string> k = kvlm_parse(c.serialize(repo));
         string parent_sha = k["#parent"];
-        if(parent_sha == "none"){throw invalid_argument("You went too far back in the genealogy");}
         return parent_sha;
     }
 

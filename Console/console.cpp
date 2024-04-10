@@ -99,6 +99,7 @@ int main(int argc, char* argv[]) {
     addCommand("commit",&write_commit_fun,"commit the tracked files and name the commit arg1",1,1);
     addCommand("checkout",&checkoutcommit,"check out the commit arg1",1,1);
     addCommand("branch",&create_branch,"create branch arg1 at HEAD",1,1);
+    addCommand("history",&show_history,"show history",0,0);
     plugin_loader();
 
     unsigned int i; 
