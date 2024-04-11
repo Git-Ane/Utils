@@ -29,7 +29,7 @@ namespace GitAne{
 
     GitRepo::GitRepo(fs::path path, bool force){
         worktree = path;
-        gitdir = path / ".git";         //on peut custom le nom du dossier
+        gitdir = path / ".gac";         //on peut custom le nom du dossier
         if(!(force || fs::is_directory(gitdir))){
             throw invalid_argument(path.string() + " is not a Gitane Repository");
         }
@@ -382,7 +382,7 @@ namespace GitAne{
         }
         cout << endl << "=== END HISTORY ===" << endl;
     }
-
+//darcs c ce que le prof a dit de check pour les git merge
 
     /*! \brief get the sha of head
     */
