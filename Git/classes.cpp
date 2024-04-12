@@ -231,6 +231,14 @@ namespace GitAne{
 
     void write_commit(string name, bool temporary){
             GitRepo repo = repo_find("");
+            vector<string> files;
+            files = listFiles();
+            for(string& file : files){
+                vector<string> args;
+                args.push_back(file);
+                track_file(args);
+                
+            }
             GitCommit c;
             unordered_map<string,string> branches = get_branches(repo);
             string sha_head = get_head(repo,true);
