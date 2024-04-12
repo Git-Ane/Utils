@@ -46,7 +46,7 @@ namespace GitAne{
         void listFilesFun(vector<string>){
             vector<string> files = listFiles();
             cout << "=== START LIST FILES ===" << endl << endl;
-            for(int i=0;i<files.size();i++){
+            for(unsigned int i=0;i<files.size();i++){
                 cout << files[i] << endl;
             }
             cout << endl << "=== END LIST FILES ===" << endl;
