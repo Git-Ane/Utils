@@ -77,12 +77,14 @@ namespace GitAne{
         void repo_init(vector<string> _){
             GitAne::create_repo(fs::current_path());
         }
+
+        void write_commit_fun(vector<string> args){
+            write_commit(args[0],false);
+        }
+
     }
 }
 
-void write_commit_fun(vector<string> args){
-    write_commit(args[0],false);
-}
 
 
 int main(int argc, char* argv[]) {

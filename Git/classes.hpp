@@ -221,6 +221,9 @@ namespace GitAne{
     void write_commit(string name, bool temporary);
     GitObject& read_object(GitRepo repo, string sha);
 
+    bool isHidden(const fs::path& path);
+    vector<string> listFiles();
+
 
     /* Idée:
     - Le serveur stocke tout le contenu du fichier

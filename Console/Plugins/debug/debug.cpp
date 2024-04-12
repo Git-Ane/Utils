@@ -43,6 +43,15 @@ namespace GitAne{
             cout << get_head(repo,true) << endl;
         }
 
+        void listFilesFun(vector<string>){
+            vector<string> files = listFiles();
+            cout << "=== START LIST FILES ===" << endl << endl;
+            for(int i=0;i<files.size();i++){
+                cout << files[i] << endl;
+            }
+            cout << endl << "=== END LIST FILES ===" << endl;
+        }
+
 
 
         void debug_plugin_loader(){
@@ -51,6 +60,7 @@ namespace GitAne{
             addCommand("write_blob",&write_file,"writes file arg1 in .git folder as a blob",1,1);
             addCommand("read_blob",&read_object_fun,"reads blob with sha of args[0]",1,1);
             addCommand("get_head_sha",&head_sha,"get sha of head",0,0);
+            addCommand("list_files",&listFilesFun,"list files present in the working directory",0,0);
         }
     }
 

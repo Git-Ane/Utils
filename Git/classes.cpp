@@ -651,4 +651,25 @@ namespace GitAne{
     }
 
 
+    bool isHidden(string path) {
+        return path.at(0) == '.';
+    }
+
+    string convertToNormalFileFormat(fs::path path){
+        return path.string().substr(2,path.string().size()-2);
+    }
+
+    vector<string> listFiles() {
+        vector<string> rep;
+        fs::path path = ".";
+        for (const auto& entry : fs::recursive_directory_iterator(path)) {
+            string entrypath = convertToNormalFileFormat(entry.path());
+            if (fs::is_regular_file(entrypath) && !isHidden(entrypath)) {
+                rep.push_back(entrypath);
+            }
+        }
+        return rep;
+    }
+
+
 }
