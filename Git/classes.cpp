@@ -229,63 +229,111 @@ namespace GitAne{
         return result;
     }
 
+    void status(vector<string>){
+        GitRepo repo = repo_find("");
+        vector<string> files;
+        files = listFiles();
+        string sha = get_head(repo,true);
+        GitObject& c = read_object(repo,sha);
+        unordered_map<string,string> k = kvlm_parse(c.serialize(repo));
+        vector<string> tracked;
+        for (auto& it: k){
+            if(it.first[0] != '#'){
+                tracked.push_back(it.first);
+            }
+        }
+        set<string> files_set;
+        for(string& file : files){
+            files_set.insert(file);
+        }
+        set<string> tracked_set;
+        for(string& file : tracked){
+            tracked_set.insert(file);
+        }
+
+        cout << "=== START GAC STATUS ===" << endl << endl;
+
+        for(string& file : files){
+            if (tracked_set.find(file) == tracked_set.end()){
+                cout << file << " Added" << endl;
+            }
+            else{
+                if(sha1(get_file_content(file)) == sha1(read_object(repo,k[file]).serialize(repo))){
+                    cout << file << " Unchanged" << endl;
+                }
+                else{
+                    cout << file << " Modified" << endl;
+                }
+            }
+        }
+
+        for(string& file : tracked){
+            if (files_set.find(file) == files_set.end()){
+                cout << file << " Deleted" << endl;
+            }
+        }
+
+        cout << endl << "=== END GAC STATUS ===" << endl;
+    }
+
+
     void write_commit(string name, bool temporary){
-            GitRepo repo = repo_find("");
-            vector<string> files;
-            files = listFiles();
-            for(string& file : files){
-                vector<string> args;
-                args.push_back(file);
-                track_file(args);
-                
-            }
-            GitCommit c;
-            unordered_map<string,string> branches = get_branches(repo);
-            string sha_head = get_head(repo,true);
-            vector<string> result = get_tracked_files(repo);
-
-            if(branches[get_active_branch(repo)]!=get_head(repo,false) && sha_head != "none"){
-                throw(logic_error("Can't commit in detached Head mode"));
-            }
-            
-            unordered_map<string, string> k;
-            k.insert(make_pair("#name",name));
-            k.insert(make_pair("#parent",sha_head));
-            if(temporary){k["#temporary"] = "true";}
-            else{k["#temporary"] = "false";}
-            
-            cout << "=== START COMMIT ===" << endl;
-            for (std::string& element : result) {
-                cout << "Found " << element << endl;
-                std::vector<unsigned char> a_hash;
-                if(!fs::exists(element)){throw(logic_error("File "+element+" doesn't exist"));}
-                ifstream file(repo.get_gitdir() / ".." / element);
-                std::stringstream buffer;
-                buffer << file.rdbuf(); // Read the entire file into the stringstream buffer
-                std::string content = buffer.str();
-
-                cout << "Read file " << element << " content was : "<< endl << content << endl;
-
-                GitBlob a_ajouter(content);
-                a_ajouter.deserialize(content); // si on le met pas ça met 0, faut vraiment utiliser full fonctions quand on utilise des réfs ...
-                string res_sha =  write_to_git_object(repo,a_ajouter);
-                k.insert(std::make_pair(element, res_sha));
-            }
-            cout<<"Explored all files to add."<<endl;
-            cout << "Writting the commit..." << endl;
-            c.deserialize(kvlm_serialize(k));
-            string sha = write_to_git_object(repo,c);
-            cout << "Changing HEAD..." << endl;
-            set_head(repo,sha);
-
-            branches[get_active_branch(repo)] = sha;
-            ofstream branch_file(repo.get_gitdir() / "branches");
-            branch_file << kvlm_serialize(branches);
-            branch_file.close();
-
-            cout << "=== END COMMIT ===" << endl;
+        GitRepo repo = repo_find("");
+        vector<string> files;
+        files = listFiles();
+        for(string& file : files){
+            vector<string> args;
+            args.push_back(file);
+            track_file(args);
             
         }
+        GitCommit c;
+        unordered_map<string,string> branches = get_branches(repo);
+        string sha_head = get_head(repo,true);
+        vector<string> result = get_tracked_files(repo);
+
+        if(branches[get_active_branch(repo)]!=get_head(repo,false) && sha_head != "none"){
+            throw(logic_error("Can't commit in detached Head mode"));
+        }
+        
+        unordered_map<string, string> k;
+        k.insert(make_pair("#name",name));
+        k.insert(make_pair("#parent",sha_head));
+        if(temporary){k["#temporary"] = "true";}
+        else{k["#temporary"] = "false";}
+        
+        cout << "=== START COMMIT ===" << endl;
+        for (std::string& element : result) {
+            cout << "Found " << element << endl;
+            std::vector<unsigned char> a_hash;
+            if(!fs::exists(element)){throw(logic_error("File "+element+" doesn't exist"));}
+            ifstream file(repo.get_gitdir() / ".." / element);
+            std::stringstream buffer;
+            buffer << file.rdbuf(); // Read the entire file into the stringstream buffer
+            std::string content = buffer.str();
+
+            cout << "Read file " << element << " content was : "<< endl << content << endl;
+
+            GitBlob a_ajouter(content);
+            a_ajouter.deserialize(content); // si on le met pas ça met 0, faut vraiment utiliser full fonctions quand on utilise des réfs ...
+            string res_sha =  write_to_git_object(repo,a_ajouter);
+            k.insert(std::make_pair(element, res_sha));
+        }
+        cout<<"Explored all files to add."<<endl;
+        cout << "Writting the commit..." << endl;
+        c.deserialize(kvlm_serialize(k));
+        string sha = write_to_git_object(repo,c);
+        cout << "Changing HEAD..." << endl;
+        set_head(repo,sha);
+
+        branches[get_active_branch(repo)] = sha;
+        ofstream branch_file(repo.get_gitdir() / "branches");
+        branch_file << kvlm_serialize(branches);
+        branch_file.close();
+
+        cout << "=== END COMMIT ===" << endl;
+        
+    }
 
 
     /*! \brief T'as vraiment besoin d'une desciption mdr ?
@@ -604,7 +652,7 @@ namespace GitAne{
 
     void GitTree::deserialize(string data){}
 
-    GitObject& read_object(GitRepo repo, string sha) { // Essayer avec ça. Si ça marhe pas, las passer en void, la faire prendre un GitObject* et le set dedans. On peut faire une variable qui indique le type et très facilement vérifeir le type de la variable de retour avec un Switch.        /*
+    GitObject& read_object(GitRepo repo, string sha, bool write) { // Essayer avec ça. Si ça marhe pas, las passer en void, la faire prendre un GitObject* et le set dedans. On peut faire une variable qui indique le type et très facilement vérifeir le type de la variable de retour avec un Switch.        /*
         /*
         * Entrée: un repo, un sha
         * Sortie: l'objet associé (sous forme de GitObject*)
@@ -621,8 +669,10 @@ namespace GitAne{
 
         std::string content = buffer.str(); // Convert the buffer to a string
 
-        std::cout << "Content of the file:" << std::endl;
-        std::cout << content << std::endl;
+        if(write){
+            std::cout << "Content of the file:" << std::endl;
+            std::cout << content << std::endl;
+        }
 
         file.close();
 

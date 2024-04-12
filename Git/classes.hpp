@@ -55,6 +55,7 @@ namespace GitAne{
     string sha_of_position(GitRepo repo,string pos);
     unordered_map<string,string> open_commit(GitRepo repo, string sha);
     void show_history(vector<string> args);
+    void status(vector<string>);
 
 
     class GitObject
@@ -219,7 +220,7 @@ namespace GitAne{
 
     string write_to_git_object(GitRepo repo, GitObject&);
     void write_commit(string name, bool temporary);
-    GitObject& read_object(GitRepo repo, string sha);
+    GitObject& read_object(GitRepo repo, string sha, bool write = false);
 
     bool isHidden(const fs::path& path);
     vector<string> listFiles();

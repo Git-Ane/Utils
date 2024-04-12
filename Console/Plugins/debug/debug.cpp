@@ -34,7 +34,7 @@ namespace GitAne{
 
         void read_object_fun(vector<string> args){
             GitRepo repo = repo_find("");
-            GitObject& b = read_object(repo,args[0]);
+            GitObject& b = read_object(repo,args[0],true);
             cout << b.serialize(repo) << endl;
         }
 
