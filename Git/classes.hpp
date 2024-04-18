@@ -40,6 +40,9 @@ namespace GitAne{
     GitRepo create_repo(fs::path);
     GitRepo repo_find(fs::path);
 
+    void remove_merge(string hash);
+    void validate_and_merge(const string& target_branch);
+    void check_merge_conflicts(const string&);
     void track_file(vector<string> args);
     void untrack_file(vector<string> args);
     vector<string> get_tracked_files(GitRepo repo);

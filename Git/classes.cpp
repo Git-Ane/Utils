@@ -1,4 +1,8 @@
 #include "classes.hpp"
+#include <filesystem>
+#include <fstream>
+#include <string>
+#include <unordered_map>
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -169,8 +173,211 @@ namespace GitAne{
         }
     }
 
-
+    string get_hash_of_branch(string nom){
+        GitRepo r = repo_find("");
+        ifstream file(r.get_gitdir() / "branches");
+        string line;
     
+        while (getline(file, line)) {
+            size_t pos = line.find(' ');
+            if (pos != string::npos) {
+                string name = line.substr(0, pos);
+                if (name == nom) {
+                    string hash = line.substr(pos + 1);
+                    return hash;
+                }
+            }
+        }
+    
+        return ""; // Retourne une chaîne vide si la branche n'a pas été trouvée
+    }
+
+    unordered_map<string, string> list_files_in_branch(string hash){
+        unordered_map<string, string> files_map;
+        fs::path objects_dir = repo_find("").get_gitdir() / "objects" / hash.substr(0, 2) / hash.substr(2);
+        ifstream file(objects_dir);
+        string line;
+
+        // Ignorer les trois premières lignes
+        getline(file, line);
+        getline(file, line);
+        getline(file, line);
+
+        // Lire le nom du fichier et son hash et les stocker dans la map
+        while (getline(file, line)) {
+            istringstream iss(line);
+            string name, file_hash;
+            if (iss >> name >> file_hash) {
+                files_map[name] = file_hash;
+            }
+        }
+
+        return files_map;
+    }
+
+    void check_merge_conflicts(const string& target_branch) {
+        GitRepo r = repo_find("");
+        string current_branch = get_active_branch(r);
+        string current_branch_hash = get_hash_of_branch(current_branch);
+        string target_branch_hash = get_hash_of_branch(target_branch);
+
+        if(target_branch_hash == ""){
+            cerr << "La branche indiquée n'existe pas." << endl;
+            return;
+        }
+        if (current_branch_hash == target_branch_hash) {
+            cout << "Les branches sont identiques. Aucune fusion nécessaire." << endl;
+            return;
+        }
+
+        if (fs::exists(r.get_gitdir() / "merge"/ current_branch_hash)) {
+            cerr << "La branche actuelle est déjà en train de faire un merge. Utilisez merge abort pour recommencer." << endl;
+            return;
+
+        }
+        else {
+            ofstream f = create_file(r.get_gitdir() / "merge"/ current_branch_hash);
+            if (!f) {
+                cerr << "Erreur lors de la création du fichier de verrouillage pour le merge." << endl;
+                return;
+            }
+
+            // Écrire le hash de la branche cible dans le fichier de verrouillage
+            f << target_branch_hash;
+            f.close();
+        }
+        
+
+        vector<string> conflicting_files;
+
+        unordered_map<string, string> current_files = list_files_in_branch(current_branch_hash);
+        unordered_map<string, string> target_files = list_files_in_branch(target_branch_hash);
+
+        for (const auto& current_file : current_files) {
+            if (target_files.find(current_file.first) != target_files.end()) {
+                // Le fichier est présent dans les deux branches, vérifier s'il y a un conflit
+                if (current_file.second != target_files[current_file.first]) {
+                    /*
+                        Ajouter la v.2
+                    */
+
+                    string hash2 = target_files[current_file.first];
+                    if(!fs::exists(r.get_gitdir() / "objects" / hash2.substr(0, 2) / hash2.substr(2))){
+                        cerr << "Le hash du fichier " << current_file.first << " n'est pas valide pour la branche cible." << endl;
+                        return;
+                    }
+                    ifstream file_v_cible(r.get_gitdir() / "objects" / hash2.substr(0, 2) / hash2.substr(2));
+                    char c;
+                    while(file_v_cible.get(c)){
+                        if(c== '\0') break;
+                    }
+                    string res;
+                    while (file_v_cible.get(c)) {
+                        res += c;
+                    }
+                    file_v_cible.close();
+                    ofstream output_file(r.get_gitdir() / "objects" / hash2.substr(0, 2) / hash2.substr(2), ios::app);
+                    // Vérifier si le fichier est ouvert
+                    if (output_file.is_open()) {
+                        // Déplacer le curseur à la fin du fichier
+                        output_file.seekp(0, ios::end);
+
+                        // Écrire la version de la branche cible suivie de la chaîne res
+                        output_file << "[" << "VERSION DE LA BRANCHE CIBLE" << "]" << endl;
+                        output_file << res;
+                        // Fermer le fichier
+                        output_file.close();
+                    } else {
+                        cerr << "Erreur lors de l'ouverture du fichier 'coucou' en mode écriture." << endl;
+                    }
+
+                    /*
+                        Modifier en .conflit
+                    */
+                    string conflicted_filename = current_file.first + ".conflit";
+                    if (rename(current_file.first.c_str(), conflicted_filename.c_str()) != 0) {
+                        cerr << "Erreur lors du renommage du fichier en conflit : " << current_file.first << endl;
+                    } else {
+                        cout << "Le fichier en conflit " << current_file.first << " a été renommé en " << conflicted_filename << endl;
+                    }
+                    conflicting_files.push_back(current_file.first);
+                }
+                else {
+                    cout << current_file.first << " existe dans la branche cible, mais il n'a pas été modifié." << endl;
+                }
+            }
+        }
+
+        if (!conflicting_files.empty()) {
+            cout << "Des conflits de fusion ont été détectés dans les fichiers suivants :" << endl;
+            for (const auto& file : conflicting_files) {
+                cout << file << endl;
+            }
+        } else {
+            cout << "Aucun conflit de fusion détecté." << endl;
+        }
+        return;
+    }
+
+    void remove_merge(string hash){
+        GitRepo r = repo_find("");
+        if(filesystem::remove_all(r.get_gitdir() / "merge" / hash) != 0){
+            cerr << "Erreur lors de la suppression du merge. Peut-être que le dossier n'existait déjà plus ?" << endl;
+        }
+        return;
+    }
+
+    void validate_and_merge(const string& target_branch) {
+        GitRepo r = repo_find("");
+        string current_branch = get_active_branch(r);
+        string current_branch_hash = get_hash_of_branch(current_branch);
+        string target_branch_hash = get_hash_of_branch(target_branch);
+
+        // Vérifier si la branche cible est encore à la même version
+        string target_branch_hash_locked;
+        ifstream lock_file(r.get_gitdir() / "merge" / current_branch_hash);
+        if (lock_file) {
+            getline(lock_file, target_branch_hash_locked);
+        }
+
+        if (target_branch_hash_locked != target_branch_hash) {
+            cerr << "La branche cible a été modifiée depuis le début du merge. Veuillez utliser merge abort puis recommencer.\n Il s'agit d'une sécurité pour éviter que vous mergiez (et donc perdiez) du travail qui soit supprimé au prochain commit de vos collègues." << endl;
+            return;
+        }
+
+        // Vérifier si tous les fichiers en conflit ont été résolus
+        vector<string> conflicting_files;
+        for (const auto& entry : fs::directory_iterator(r.get_gitdir())) {
+            if (fs::is_regular_file(entry.path())) {
+                if (entry.path().extension() == ".conflit") {
+                    conflicting_files.push_back(entry.path().filename());
+                }
+            }
+        }
+
+        if (!conflicting_files.empty()) {
+            cout << "Des fichiers en conflit subsistent. Résolvez-les avant de finaliser la fusion." << endl;
+            for (const auto& file : conflicting_files) {
+                cout << file << endl;
+            }
+            return;
+        }
+
+        // Supprimer le fichier de verrouillage du merge
+        fs::remove(r.get_gitdir() / "merge" / current_branch_hash);
+
+        /*
+        * ICI IL FAUT FAIRE LA FUSION, ON VERRA A DEUX.
+        *
+        */
+
+        cout << "La fusion des branches AURAIT été effectuée avec succès. Mais il faut qu'on voit à deux pour qu'on soit d'accord." << endl;
+        return;
+    }
+
+
+
+
 
     string write_to_git_object(GitRepo repo, GitObject& obj) {
         /*
@@ -420,7 +627,6 @@ namespace GitAne{
         else{
             unordered_map<string,string> branches = get_branches(repo);
             sha = branches[pos];
-            if (sha ==""){throw invalid_argument(pos + " is not a branch");}
         }
         return sha;
     }
