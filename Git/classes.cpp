@@ -420,6 +420,7 @@ namespace GitAne{
         else{
             unordered_map<string,string> branches = get_branches(repo);
             sha = branches[pos];
+            if (sha ==""){throw invalid_argument(pos + " is not a branch");}
         }
         return sha;
     }
