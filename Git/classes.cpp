@@ -441,8 +441,8 @@ namespace GitAne{
         vector<string> files;
         files = listFiles();
         string sha = get_head(repo,true);
-        GitObject& c = read_object(repo,sha);
-        unordered_map<string,string> k = kvlm_parse(c.serialize(repo));
+        string s = read_object(repo,sha);
+        unordered_map<string,string> k = kvlm_parse(s);
         vector<string> tracked;
         for (auto& it: k){
             if(it.first[0] != '#'){
@@ -465,7 +465,7 @@ namespace GitAne{
                 cout << file << " Added" << endl;
             }
             else{
-                if(sha1(get_file_content(file)) == sha1(read_object(repo,k[file]).serialize(repo))){
+                if(sha1(get_file_content(file)) == sha1(read_object(repo,k[file]))){
                     cout << file << " Unchanged" << endl;
                 }
                 else{
@@ -574,17 +574,17 @@ namespace GitAne{
         vector<string> tracked = get_tracked_files(repo);
         ofstream tracks_file(repo.get_gitdir() / "tracked");
         tracks_file.close();
-        GitObject& c = read_object(repo,sha);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
-        unordered_map<string,string> k = kvlm_parse(c.serialize(repo));
+        string s = read_object(repo,sha);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
+        unordered_map<string,string> k = kvlm_parse(s);
         set<string> still_exist;
         string name = k["#name"];
         cout << "=== START CHECKOUT COMMIT " + name + " ===" <<endl;
         for (auto& it: k) {
             cout << "File " << it.first << endl;
             if(it.first[0]!='#'){
-                GitObject& b = read_object(repo,it.second);
+                string s = read_object(repo,it.second);
                 ofstream f(it.first);
-                f << b.serialize(repo);
+                f << s;
                 f.close();
                 vector<string> args;
                 args.push_back(it.first);
@@ -656,16 +656,16 @@ namespace GitAne{
         string content = buffer.str();
         file.close();
         if(ignore_temporary && content != "none"){
-            GitObject& c = read_object(repo,content);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
-            unordered_map<string,string> k = kvlm_parse(c.serialize(repo));
+            string s = read_object(repo,content);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
+            unordered_map<string,string> k = kvlm_parse(s);
             if(k["#temporary"]=="true"){content = k["#parent"];}        //c moins propre pour le code que faire get_parent mais ca va plus vite
         }
         return content;
     }
 
     unordered_map<string,string> open_commit(GitRepo repo, string sha){
-        GitObject& c = read_object(repo,sha);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
-        unordered_map<string,string> k = kvlm_parse(c.serialize(repo));
+        string s = read_object(repo,sha);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
+        unordered_map<string,string> k = kvlm_parse(s);
         return k;
     }
 
@@ -702,8 +702,8 @@ namespace GitAne{
     /*! \brief get the parent of commit with sha sha
     */
     string get_parent(GitRepo repo, string sha){
-        GitObject& c = read_object(repo,sha);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
-        unordered_map<string,string> k = kvlm_parse(c.serialize(repo));
+        string s = read_object(repo,sha);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
+        unordered_map<string,string> k = kvlm_parse(s);
         string parent_sha = k["#parent"];
         return parent_sha;
     }
@@ -859,7 +859,7 @@ namespace GitAne{
 
     void GitTree::deserialize(string data){}
 
-    GitObject& read_object(GitRepo repo, string sha, bool write) { // Essayer avec ça. Si ça marhe pas, las passer en void, la faire prendre un GitObject* et le set dedans. On peut faire une variable qui indique le type et très facilement vérifeir le type de la variable de retour avec un Switch.        /*
+    string read_object(GitRepo repo, string sha, bool write) { // Essayer avec ça. Si ça marhe pas, las passer en void, la faire prendre un GitObject* et le set dedans. On peut faire une variable qui indique le type et très facilement vérifeir le type de la variable de retour avec un Switch.        /*
         /*
         * Entrée: un repo, un sha
         * Sortie: l'objet associé (sous forme de GitObject*)
@@ -899,19 +899,7 @@ namespace GitAne{
 
         // Pick constructor based on object type
         
-        if (fmt == "blob") {
-            static GitBlob obj = GitBlob(content);
-            obj.deserialize(content);
-            return obj;
-        } 
-        else if(fmt == "commit"){
-            static GitCommit obj = GitCommit();
-            obj.deserialize(content);
-            return obj;
-        }
-        else {
-            throw std::runtime_error("Unknown type " + fmt + " for object " + sha);
-        }
+        return content;
         
     }
 

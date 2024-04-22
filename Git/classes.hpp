@@ -223,7 +223,7 @@ namespace GitAne{
 
     string write_to_git_object(GitRepo repo, GitObject&);
     void write_commit(string name, bool temporary);
-    GitObject& read_object(GitRepo repo, string sha, bool write = false);
+    string read_object(GitRepo repo, string sha, bool write = false);
 
     bool isHidden(const fs::path& path);
     vector<string> listFiles();
