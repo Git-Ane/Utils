@@ -80,7 +80,10 @@ namespace GitAne{
         active_branch_file << "main";
         active_branch_file.close();
 
-        create_file(repo.get_gitdir() / "branches");
+        ofstream branches = create_file(repo.get_gitdir() / "branches");
+        branches << "main none";
+        branches.close();
+
         create_dir(repo.get_gitdir() / "objects");
         create_dir(repo.get_gitdir() / "refs");
         create_dir(repo.get_gitdir() / "refs/tags");
@@ -573,10 +576,25 @@ namespace GitAne{
         vector<string> tracked = get_tracked_files(repo);
         ofstream tracks_file(repo.get_gitdir() / "tracked");
         tracks_file.close();
-        string s = read_object(repo,sha);   //j'arrive pas a faire du polymorphisme pour dire que c un commit
+        cout << "sha : " << sha << endl;
+        string s;
+        if(sha=="none"){
+            s = "";
+        }
+        else{
+            s = read_object(repo,sha);
+        }
+        cout << "ok" << endl;
+          
         unordered_map<string,string> k = kvlm_parse(s);
         set<string> still_exist;
-        string name = k["#name"];
+        string name;
+        if(sha == "none"){
+            name = "none";
+        }
+        else{
+            name = k["#name"];
+        }
         cout << "=== START CHECKOUT COMMIT " + name + " ===" <<endl;
         for (auto& it: k) {
             cout << "File " << it.first << endl;
@@ -626,6 +644,7 @@ namespace GitAne{
         else{
             unordered_map<string,string> branches = get_branches(repo);
             sha = branches[pos];
+            if(sha == ""){throw(invalid_argument(pos + " is not a branch name"));}
         }
         return sha;
     }
