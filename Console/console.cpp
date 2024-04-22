@@ -82,6 +82,14 @@ namespace GitAne{
             write_commit(args[0],false);
         }
 
+        void list_branches_fun(vector<string>){
+            GitRepo repo = repo_find("");
+            unordered_map<string,string> k = get_branches(repo);
+            for (auto& it: k){
+                cout << it.first << endl;
+            }
+        }
+
     }
 }
 
@@ -103,6 +111,7 @@ int main(int argc, char* argv[]) {
     addCommand("branch",&create_branch,"create branch arg1 at HEAD",1,1);
     addCommand("history",&show_history,"show history",0,0);
     addCommand("status",&status,"show history",0,0);
+    addCommand("list_branches",&list_branches_fun,"list the branches of the GitAne repo",0,0);
     plugin_loader();
 
     unsigned int i; 
