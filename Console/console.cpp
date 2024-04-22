@@ -104,8 +104,6 @@ int main(int argc, char* argv[]) {
     addCommand("help",&std_helpmsg,"Help message about std plugin",0,0);
     addCommand("hello",&sayHello,"says hello :)",0,0); 
     addCommand("init",&repo_init,"inits the current repository to be a Gitane repository",0,0);
-    addCommand("untrack",&untrack_file,"untrack arg1 for the active branch",1,1);
-    addCommand("track",&track_file,"track arg1 for the active branch",1,1);
     addCommand("commit",&write_commit_fun,"commit the tracked files and name the commit arg1",1,1);
     addCommand("checkout",&checkoutcommit,"check out the commit arg1",1,1);
     addCommand("branch",&create_branch,"create branch arg1 at HEAD",1,1);

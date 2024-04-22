@@ -497,7 +497,6 @@ namespace GitAne{
         GitCommit c;
         unordered_map<string,string> branches = get_branches(repo);
         string sha_head = get_head(repo,true);
-        vector<string> result = get_tracked_files(repo);
 
         if(branches[get_active_branch(repo)]!=get_head(repo,false) && sha_head != "none"){
             throw(logic_error("Can't commit in detached Head mode"));
@@ -510,7 +509,7 @@ namespace GitAne{
         else{k["#temporary"] = "false";}
         
         cout << "=== START COMMIT ===" << endl;
-        for (std::string& element : result) {
+        for (std::string& element : files) {
             cout << "Found " << element << endl;
             std::vector<unsigned char> a_hash;
             if(!fs::exists(element)){throw(logic_error("File "+element+" doesn't exist"));}
