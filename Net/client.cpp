@@ -17,7 +17,7 @@ class NetClient {
             // En pratique il faudra demander une clé publique au serveur avant d'envoyer le MDP
             http::Request request(s + "/");
             const http::Response loginResponse = request.send("GET", "[GITPARAM]email="+e+"&mdp="+m, {"Content-Type: application/x-www-form-urlencoded"});
-            std::cout << std::string(loginResponse.body.begin(), loginResponse.body.end()) << '\n'; // print the result
+            cout << string(loginResponse.body.begin(), loginResponse.body.end()) << '\n'; // print the result
         }
     private:
         string token;

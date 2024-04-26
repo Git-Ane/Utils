@@ -23,6 +23,7 @@ namespace GitAne::Net
         */
         return buildOkPage("GitÂne - Main Page", "<p>If you want to move to a specified plug-in manual, move to [domain]/plugin/[plugin_name]. Everything should be explained there if they respect the conventions.</p><br/><p>If you are developping a plug-in and you can not see your plug-in here, be sure you editted the plugin-list file.</p> <h2> Installed Plugins </h2> <p>Nothing there yet.</p>");
     }
+
     /* PRIMITIVES */
     TcpServer::TcpServer(std::string d, int p):
         max_curr_conn(100),id_socket(),new_socket(),sockAddr_len(),port(p),sockAddr(),BUFFER_SIZE(30720),domain(d),
@@ -32,7 +33,8 @@ namespace GitAne::Net
         sockAddr.sin_family = AF_INET;
         sockAddr.sin_port = htons(p); // passage en big-endian
         sockAddr.sin_addr.s_addr = inet_addr(d.c_str());
-        urlTree = UrlTree();
+        // La c'est important !
+        urlTree = UrlTree(); // Le serveur a un UrlTree qui lui sert à savoir comment rediriger selon l'url (serveur/login ou serveur/git/commit, etc).
         urlTree.addPath("/", buildDefaultResponse);
         urlTree.addPath("/login", buildLoginResponse);
         urlTree.addPath("/register", buildRegisterResponse);

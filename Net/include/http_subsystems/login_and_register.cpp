@@ -4,8 +4,13 @@ using json = nlohmann::json;
 namespace GitAne::Net
 {    
 
+// Exemple de page web
 std::string buildLoginResponse(std::string method, std::string args){
         /*
+        \brief Construction of the Login page
+        \param method GET or POST
+        \param args query arguments, there is a parseQueryString built-in function.
+
         Default print for the API, accessible using only your domain name.
         It (will) print to you all the availables URLs & descriptors (according to the plug-ins).
         */

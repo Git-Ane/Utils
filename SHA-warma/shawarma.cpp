@@ -11,11 +11,11 @@ namespace GitAne{
     son hash et on en déduit celui de son père.
     */
     double hashing_file(std::string path, std::string content){
-        return 0.;
+        return 0.; // now in class.cpp because fuck off
     }
 
     double hashing_folder(std::string path){
-        return 0.;
+        return 0.; // now in class.cpp because fuck off
     }
 
     std::string sha1(const std::string &input) {

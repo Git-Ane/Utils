@@ -2,6 +2,9 @@
 // For GitÂne's Net
 #include "url_tree.hpp"
 
+
+// ce fichier tu as pas à le modifier.
+
 void Node::addChild(const std::string& urlPart, const Node& child) {
     children[urlPart] = child;
 }
@@ -13,6 +16,11 @@ void Node::addLeaf(const std::string& name, std::function<std::string(std::strin
 }
 
 void UrlTree::addPath(const std::string& path, std::function<std::string(std::string method, std::string args)> action) {
+    /*
+    \brief ajoute action comme réponse à l'url path
+    \param path
+    \param la fonction d'action
+    */
     Node* currentNode = &root;
 
     size_t start = 0;
