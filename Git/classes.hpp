@@ -19,8 +19,6 @@ namespace fs = std::filesystem;
 
 using namespace std;
 
-void create_dir(fs::path);
-ofstream create_file(fs::path);
 
 namespace GitAne{
 
@@ -39,10 +37,6 @@ namespace GitAne{
 
     GitRepo create_repo(fs::path);
     GitRepo repo_find(fs::path);
-
-    void remove_merge(string hash);
-    void validate_and_merge(const string& target_branch);
-    void check_merge_conflicts(const string&);
     void track_file(vector<string> args);
     void untrack_file(vector<string> args);
     vector<string> get_tracked_files(GitRepo repo);
@@ -59,6 +53,13 @@ namespace GitAne{
     unordered_map<string,string> open_commit(GitRepo repo, string sha);
     void show_history(vector<string> args);
     void status(vector<string>);
+
+    string get_hash_of_branch(string nom);
+    unordered_map<string, string> list_files_in_branch(string hash);
+
+    void create_dir(fs::path);
+ofstream create_file(fs::path);
+
 
 
     class GitObject

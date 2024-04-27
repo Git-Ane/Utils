@@ -52,20 +52,6 @@ namespace GitAne{
             cout << endl << "=== END LIST FILES ===" << endl;
         }
 
-        void merge_fun(vector<string> v){
-            if(v.size() == 2 && v[0] == "check"){
-                check_merge_conflicts(v[1]);
-                return;
-            }
-            if(v.size() == 2 && v[0] == "validate"){
-                validate_and_merge(v[1]);
-                return;
-            }
-            cerr << "Mauvais format d'argument pour le merge. Vous pouvez faire:\n- merge check nom_branche: check si vous pouvez commit, sinon il faudra résoudre les .conflit qui sont apparus.\n- merge validate: valide, après avoir fait un check et avoir résolue les éventuels problèmes, le merge." << endl;
-            return;
-        }
-
-
 
         void debug_plugin_loader(){
             initPlugin("debug");
@@ -74,7 +60,6 @@ namespace GitAne{
             addCommand("read_blob",&read_object_fun,"reads blob with sha of args[0]",1,1);
             addCommand("get_head_sha",&head_sha,"get sha of head",0,0);
             addCommand("list_files",&listFilesFun,"list files present in the working directory",0,0);
-            addCommand("merge", &merge_fun, "merge function. Use merge check branch_name and then merge validate branch_name.",0,2);
         }
     }
 

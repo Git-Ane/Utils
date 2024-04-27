@@ -223,7 +223,9 @@ namespace GitAne{
         string current_branch = get_active_branch(r);
         string current_branch_hash = get_hash_of_branch(current_branch);
         string target_branch_hash = get_hash_of_branch(target_branch);
-
+        if(!fs::exists(r.get_gitdir() / "merge")){
+            create_dir(r.get_gitdir() / "merge");
+        }
         if(target_branch_hash == ""){
             cerr << "La branche indiquée n'existe pas." << endl;
             return;
@@ -278,10 +280,12 @@ namespace GitAne{
                     while (file_v_cible.get(c)) {
                         res += c;
                     }
+                    cout << "On veut ajouter " << res << "au fichier" << endl;
                     file_v_cible.close();
-                    ofstream output_file(r.get_gitdir() / "objects" / hash2.substr(0, 2) / hash2.substr(2), ios::app);
+                    ofstream output_file(current_file.first, ios::app);
                     // Vérifier si le fichier est ouvert
                     if (output_file.is_open()) {
+                        cout << "On a ouvert " << current_file.first << endl; 
                         // Déplacer le curseur à la fin du fichier
                         output_file.seekp(0, ios::end);
 
@@ -318,6 +322,7 @@ namespace GitAne{
             }
         } else {
             cout << "Aucun conflit de fusion détecté." << endl;
+            cout << "ON FAIT QUOI MTN ?" << endl;
         }
         return;
     }
@@ -335,7 +340,6 @@ namespace GitAne{
         string current_branch = get_active_branch(r);
         string current_branch_hash = get_hash_of_branch(current_branch);
         string target_branch_hash = get_hash_of_branch(target_branch);
-
         // Vérifier si la branche cible est encore à la même version
         string target_branch_hash_locked;
         ifstream lock_file(r.get_gitdir() / "merge" / current_branch_hash);
@@ -368,7 +372,6 @@ namespace GitAne{
 
         // Supprimer le fichier de verrouillage du merge
         fs::remove(r.get_gitdir() / "merge" / current_branch_hash);
-
         /*
         * ICI IL FAUT FAIRE LA FUSION, ON VERRA A DEUX.
         *
