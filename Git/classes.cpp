@@ -325,6 +325,50 @@ namespace GitAne{
         cout << endl << "=== END GAC STATUS ===" << endl;
     }
 
+    bool made_changes(GitRepo repo){
+        vector<string> files;
+        files = listFiles();
+        string sha = get_head(repo,true);
+        string s = read_object(repo,sha);
+        unordered_map<string,string> k = kvlm_parse(s);
+        vector<string> tracked;
+        for (auto& it: k){
+            if(it.first[0] != '#'){
+                tracked.push_back(it.first);
+            }
+        }
+        set<string> files_set;
+        for(string& file : files){
+            files_set.insert(file);
+        }
+        set<string> tracked_set;
+        for(string& file : tracked){
+            tracked_set.insert(file);
+        }
+
+
+        for(string& file : files){
+            if (tracked_set.find(file) == tracked_set.end()){
+                return true;
+            }
+            else{
+                if(sha1(get_file_content(file)) == sha1(read_object(repo,k[file]))){
+                }
+                else{
+                    return true;
+                }
+            }
+        }
+
+        for(string& file : tracked){
+            if (files_set.find(file) == files_set.end()){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     void write_commit(string name, bool temporary){
         GitRepo repo = repo_find("");

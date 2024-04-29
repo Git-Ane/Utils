@@ -53,6 +53,7 @@ namespace GitAne{
     unordered_map<string,string> open_commit(GitRepo repo, string sha);
     void show_history(vector<string> args);
     void status(vector<string>);
+    bool made_changes(GitRepo repo);
 
     string get_hash_of_branch(string nom);
     unordered_map<string, string> list_files_in_branch(string hash);

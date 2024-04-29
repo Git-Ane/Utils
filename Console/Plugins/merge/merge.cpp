@@ -8,8 +8,10 @@ namespace GitAne{
     namespace Merge{
     void check_merge_conflicts(const string& target_branch) {
             GitRepo r = repo_find("");
-            string current_branch = get_active_branch(r);
-            string current_branch_hash = get_hash_of_branch(current_branch);
+            if(made_changes(r)){
+                throw(logic_error("Commit your changes before you merge"));
+            }
+            string current_branch_hash = get_head(r,true);
             string target_branch_hash = get_hash_of_branch(target_branch);
             if(!fs::exists(r.get_gitdir() / "merge")){
                 create_dir(r.get_gitdir() / "merge");
@@ -137,10 +139,11 @@ namespace GitAne{
             getline(lock_file, target_branch_hash_locked);
         }
 
-        if (target_branch_hash_locked != target_branch_hash) {
+        /*if (target_branch_hash_locked != target_branch_hash) {
             cerr << "La branche cible a été modifiée depuis le début du merge. Veuillez utliser merge abort puis recommencer.\n Il s'agit d'une sécurité pour éviter que vous mergiez (et donc perdiez) du travail qui soit supprimé au prochain commit de vos collègues." << endl;
             return;
-        }
+        }*/
+        //pour moi ça sert à rien psq la branche est de tt façon pas supprimée
 
         // Vérifier si tous les fichiers en conflit ont été résolus
         vector<string> conflicting_files;
