@@ -45,8 +45,8 @@ namespace GitAne{
 
             vector<string> conflicting_files;
 
-            unordered_map<string, string> current_files = list_files_in_branch(current_branch_hash);
-            unordered_map<string, string> target_files = list_files_in_branch(target_branch_hash);
+            unordered_map<string, string> current_files = open_commit(r,current_branch_hash);
+            unordered_map<string, string> target_files = open_commit(r,target_branch_hash);
 
             for (const auto& current_file : current_files) {
                 if (target_files.find(current_file.first) != target_files.end() && current_file.first[0] != '#') {

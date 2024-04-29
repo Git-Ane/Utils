@@ -15,6 +15,7 @@
 #include <zlib.h>
 #include <unordered_map>
 #include <set>
+#include <regex>
 namespace fs = std::filesystem;
 
 using namespace std;
@@ -56,10 +57,13 @@ namespace GitAne{
     bool made_changes(GitRepo repo);
 
     string get_hash_of_branch(string ,bool ignore_temporary);
-    unordered_map<string, string> list_files_in_branch(string hash);
 
     void create_dir(fs::path);
-ofstream create_file(fs::path);
+    ofstream create_file(fs::path);
+
+    bool matchPattern(const std::string& filePath, const std::string& pattern);
+    bool shouldIgnoreFile(const std::string& filePath, const std::vector<std::string>& patterns);
+    std::vector<std::string> parseGitIgnore(const std::string& gitIgnorePath);
 
 
 

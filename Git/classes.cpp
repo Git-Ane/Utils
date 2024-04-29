@@ -186,28 +186,6 @@ namespace GitAne{
         else{return sha;}
     }
 
-    unordered_map<string, string> list_files_in_branch(string hash){
-        unordered_map<string, string> files_map;
-        fs::path objects_dir = repo_find("").get_gitdir() / "objects" / hash.substr(0, 2) / hash.substr(2);
-        ifstream file(objects_dir);
-        string line;
-
-        // Ignorer les trois premières lignes
-        getline(file, line);
-        getline(file, line);
-        getline(file, line);
-
-        // Lire le nom du fichier et son hash et les stocker dans la map
-        while (getline(file, line)) {
-            istringstream iss(line);
-            string name, file_hash;
-            if (iss >> name >> file_hash) {
-                files_map[name] = file_hash;
-            }
-        }
-
-        return files_map;
-    }
 
     
 
@@ -452,6 +430,8 @@ namespace GitAne{
         vector<string> tracked = get_tracked_files(repo);
         ofstream tracks_file(repo.get_gitdir() / "tracked");
         tracks_file.close();
+        vector<std::string> ignorePatterns = parseGitIgnore(".gacignore");
+        ignorePatterns.push_back(".gac/*");
         cout << "sha : " << sha << endl;
         string s;
         if(sha=="none"){
@@ -486,7 +466,7 @@ namespace GitAne{
             }
         }
         for (string& element : tracked){    //les fichiers qui sont suivis mais pas dans le commit ou on checkout on les supprime
-            if (still_exist.find(element) == still_exist.end()){
+            if (still_exist.find(element) == still_exist.end() && !shouldIgnoreFile(element,ignorePatterns)){
                 cout << "File " << element << " doesn't exist" << endl << "Do you want to remove it ? [y/n] "; 
                 //je demande mais on va pt enlever ca en vrai
                 string rep;
@@ -816,14 +796,52 @@ namespace GitAne{
 
     vector<string> listFiles() {
         vector<string> rep;
+        vector<std::string> ignorePatterns = parseGitIgnore(".gacignore");
+        ignorePatterns.push_back(".gac/*");
         fs::path path = ".";
         for (const auto& entry : fs::recursive_directory_iterator(path)) {
             string entrypath = convertToNormalFileFormat(entry.path());
-            if (fs::is_regular_file(entrypath) && !isHidden(entrypath)) {
+            if (fs::is_regular_file(entrypath) && !shouldIgnoreFile(entrypath,ignorePatterns)) {
                 rep.push_back(entrypath);
             }
         }
         return rep;
+    }
+
+
+    bool matchPattern(const std::string& filePath, const std::string& pattern) {
+        // Convert gitignore pattern to regex
+        std::string regexPattern = std::regex_replace(pattern, std::regex("\\."), "\\.");
+        regexPattern = std::regex_replace(regexPattern, std::regex("\\*"), ".*");
+        regexPattern = std::regex_replace(regexPattern, std::regex("\\?"), ".");
+        regexPattern = "^" + regexPattern + "$";
+
+        // Perform regex match
+        return std::regex_match(filePath, std::regex(regexPattern));
+    }
+
+    // Function to check if a file should be ignored according to gitignore rules
+    bool shouldIgnoreFile(const std::string& filePath, const std::vector<std::string>& patterns) {
+        for (const auto& pattern : patterns) {
+            if (matchPattern(filePath, pattern)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Function to parse .gitignore file and store patterns in a vector
+    std::vector<std::string> parseGitIgnore(const std::string& gitIgnorePath) {
+        std::vector<std::string> patterns;
+        std::ifstream file(gitIgnorePath);
+        if (file.is_open()) {
+            std::string line;
+            while (std::getline(file, line)) {
+                patterns.push_back(line);
+            }
+            file.close();
+        }
+        return patterns;
     }
 
 
