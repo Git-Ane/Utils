@@ -224,7 +224,7 @@ ofstream create_file(fs::path);
     };
 
     string write_to_git_object(GitRepo repo, GitObject&);
-    void write_commit(string name, bool temporary);
+    void write_commit(string name, bool temporary,string second_parent);
     string read_object(GitRepo repo, string sha, bool write = false);
 
     bool isHidden(const fs::path& path);

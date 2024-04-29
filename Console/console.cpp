@@ -79,7 +79,7 @@ namespace GitAne{
         }
 
         void write_commit_fun(vector<string> args){
-            write_commit(args[0],false);
+            write_commit(args[0],false, "");
         }
 
         void list_branches_fun(vector<string>){

@@ -370,7 +370,7 @@ namespace GitAne{
     }
 
 
-    void write_commit(string name, bool temporary){
+    void write_commit(string name, bool temporary, string second_parent){
         GitRepo repo = repo_find("");
         vector<string> files;
         files = listFiles();
@@ -393,6 +393,7 @@ namespace GitAne{
         k.insert(make_pair("#parent",sha_head));
         if(temporary){k["#temporary"] = "true";}
         else{k["#temporary"] = "false";}
+        if(second_parent != ""){k["#second_parent"] = second_parent;}
         
         cout << "=== START COMMIT ===" << endl;
         for (std::string& element : files) {
@@ -451,10 +452,11 @@ namespace GitAne{
         string sha_head = get_head(repo,false);
         if(sha_head == sha){
             cout << "You are already at head" << endl;
+            if(args[0].substr(0,4)!="HEAD"){set_active_branch(repo,args[0]);}
             return;
         }
         unordered_map<string,string> branches = get_branches(repo);
-        if(!(branches[get_active_branch(repo)]!=sha_head && sha_head != "none")){write_commit("temporary_commit",true);}
+        if(!(branches[get_active_branch(repo)]!=sha_head && sha_head != "none")){write_commit("temporary_commit",true,"");}
         else{cout<< "No temporary commit was made, because of detached HEAD mode" <<endl << branches[get_active_branch(repo)] << " " << sha_head << endl;}
         vector<string> tracked = get_tracked_files(repo);
         ofstream tracks_file(repo.get_gitdir() / "tracked");
@@ -515,8 +517,16 @@ namespace GitAne{
         if(pos=="HEAD"){
             return get_head(repo,true);
         }
+        else if(pos == "HEAD*"){
+            string s = read_object(repo,get_head(repo,true)); 
+            unordered_map<string,string> k = kvlm_parse(s);
+            if (k.find("#second_parent") == k.end()){
+                throw(invalid_argument("This commit only has 1 parent"));
+            }
+            string parent_sha = k["#second_parent"];
+            return parent_sha;
+        }
         else if(pos.substr(0,5)=="HEAD-"){
-            cout << pos.substr(5,pos.size()-5) << endl;
             int i = stoi(pos.substr(5,pos.size()-5));
             sha = get_head(repo,false);
             for (int a=0;a<i;a++){
