@@ -1,5 +1,4 @@
 #include "merge.hpp"
-#include <unordered_map>
 
 using namespace GitAne::Console;
 using namespace GitAne;
@@ -48,7 +47,7 @@ namespace GitAne{
             unordered_map<string, string> target_files = list_files_in_branch(target_branch_hash);
 
             for (const auto& current_file : current_files) {
-                if (target_files.find(current_file.first) != target_files.end()) {
+                if (target_files.find(current_file.first) != target_files.end() && current_file.first[0] != '#') {
                     // Le fichier est présent dans les deux branches, vérifier s'il y a un conflit
                     if (current_file.second != target_files[current_file.first]) {
                         /*
