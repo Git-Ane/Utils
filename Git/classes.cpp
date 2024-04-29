@@ -176,23 +176,14 @@ namespace GitAne{
         }
     }
 
-    string get_hash_of_branch(string nom){
+    string get_hash_of_branch(string nom, bool ignore_temporary){
         GitRepo r = repo_find("");
-        ifstream file(r.get_gitdir() / "branches");
-        string line;
-    
-        while (getline(file, line)) {
-            size_t pos = line.find(' ');
-            if (pos != string::npos) {
-                string name = line.substr(0, pos);
-                if (name == nom) {
-                    string hash = line.substr(pos + 1);
-                    return hash;
-                }
-            }
-        }
-    
-        return ""; // Retourne une chaîne vide si la branche n'a pas été trouvée
+        string s = get_file_content(r.get_gitdir() / "branches");
+        unordered_map<string,string> k = kvlm_parse(s);
+        string sha = k[nom];
+        k = kvlm_parse(read_object(r,sha));
+        if(k["#temporary"]=="true"){return k["#parent"];} 
+        else{return sha;}
     }
 
     unordered_map<string, string> list_files_in_branch(string hash){

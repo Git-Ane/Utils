@@ -12,7 +12,7 @@ namespace GitAne{
                 throw(logic_error("Commit your changes before you merge"));
             }
             string current_branch_hash = get_head(r,true);
-            string target_branch_hash = get_hash_of_branch(target_branch);
+            string target_branch_hash = get_hash_of_branch(target_branch, true);
             if(!fs::exists(r.get_gitdir() / "merge")){
                 create_dir(r.get_gitdir() / "merge");
             }
@@ -105,6 +105,15 @@ namespace GitAne{
                 }
             }
 
+            for (const auto& target_file : target_files) {
+                if (current_files.find(target_file.first) == current_files.end() && target_file.first[0] != '#'){
+                    string content = read_object(r,target_file.second);
+                    ofstream f = create_file(target_file.first);
+                    f << content;
+                    f.close();
+                }
+            }
+
             if (!conflicting_files.empty()) {
                 cout << "Des conflits de fusion ont été détectés dans les fichiers suivants :" << endl;
                 for (const auto& file : conflicting_files) {
@@ -130,8 +139,8 @@ namespace GitAne{
     void validate_and_merge(const string& target_branch) {
         GitRepo r = repo_find("");
         string current_branch = get_active_branch(r);
-        string current_branch_hash = get_hash_of_branch(current_branch);
-        string target_branch_hash = get_hash_of_branch(target_branch);
+        string current_branch_hash = get_hash_of_branch(current_branch, true);
+        string target_branch_hash = get_hash_of_branch(target_branch, true);
         // Vérifier si la branche cible est encore à la même version
         string target_branch_hash_locked;
         ifstream lock_file(r.get_gitdir() / "merge" / current_branch_hash);

@@ -55,7 +55,7 @@ namespace GitAne{
     void status(vector<string>);
     bool made_changes(GitRepo repo);
 
-    string get_hash_of_branch(string nom);
+    string get_hash_of_branch(string ,bool ignore_temporary);
     unordered_map<string, string> list_files_in_branch(string hash);
 
     void create_dir(fs::path);
