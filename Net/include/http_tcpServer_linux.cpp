@@ -1,6 +1,13 @@
 // Code from a course on medium, rewritten for GitÂne.
 
 #include "http_tcpServer_linux.h"
+
+#include <fstream>
+#include <iostream>
+#include <filesystem>
+#include <fstream>
+#include <string>
+#include <unordered_map>
 /*
 
 Still in work. Only support redirection & URL tree yet. Missing:
@@ -10,10 +17,12 @@ Still in work. Only support redirection & URL tree yet. Missing:
 - Database for register/login
 - Everything related to 
 */
-using json = nlohmann::json;
-namespace GitAne::Net
-{    
 
+using json = nlohmann::json;
+
+using namespace std;
+namespace fs = filesystem;
+namespace GitAne::Net{
     // Default Builds
 
     std::string buildDefaultResponse(std::string method, std::string args){
@@ -30,6 +39,24 @@ namespace GitAne::Net
         serverMessage(buildDefaultResponse("",""))
     {
 
+        // On créé les fichiers nécessaires.
+        if(!std::filesystem::exists("./bdd")){
+            fs::create_directory("./bdd");
+        }
+        if(!fs::exists("./bdd/users.json")){
+            ofstream outputFile("./bdd/users.json");
+            outputFile << "{}";
+            outputFile.close();
+        }
+        if(!fs::exists("./bdd/log.txt")){
+            ofstream outputFile("./bdd/log.txt");
+            outputFile << "[*] Server Created" << endl;
+            outputFile.close();
+        }
+        if(!fs::exists("./bdd/gacs")){
+            fs::create_directory("./bdd/gacs");
+        }
+
         sockAddr.sin_family = AF_INET;
         sockAddr.sin_port = htons(p); // passage en big-endian
         sockAddr.sin_addr.s_addr = inet_addr(d.c_str());
@@ -38,6 +65,9 @@ namespace GitAne::Net
         urlTree.addPath("/", buildDefaultResponse);
         urlTree.addPath("/login", buildLoginResponse);
         urlTree.addPath("/register", buildRegisterResponse);
+        urlTree.addPath("/lamule/send",buildSendFileResponse);
+        urlTree.addPath("/lamule/receive",buildReceiveFileResponse);
+        urlTree.addPath("/lamule",buildLaMuleResponse);
         start();
     }
 
@@ -50,12 +80,12 @@ namespace GitAne::Net
         id_socket = socket(AF_INET,SOCK_STREAM,0);
         if(id_socket < 0)
         {
-            std::cout << "ERREUR: Impossible de créer une socket";
+            std::cout << "[!] Impossible de créer une socket";
             return 1;
         }
         sockAddr_len = sizeof(sockAddr);
         if(bind(id_socket,(sockaddr *)&sockAddr,sockAddr_len) < 0){
-            std::cout << "ERREUR: Impossible de connecter le socket à l'addresse " << domain;
+            std::cout << "[!] Impossible de connecter le socket à l'addresse " << domain;
             return 1;
         }
         return 0;
@@ -64,7 +94,7 @@ namespace GitAne::Net
     std::pair<std::string, std::string> urlAndMethod(const char* buffer) {
         const char* firstNewLine = std::strchr(buffer, '\n');
         if (firstNewLine == nullptr) {
-            std::cerr << "ERREUR: Format de requête invalide." << std::endl;
+            std::cerr << "[!] Format de requête invalide." << std::endl;
             return {"", ""};
         }
 
@@ -108,7 +138,7 @@ namespace GitAne::Net
 
     void TcpServer::startListening(){
         if(listen(id_socket,max_curr_conn) < 0) {
-            std::cout << "ERREUR: Queue pleine.";
+            std::cout << "[!] Queue pleine.";
             return;
         }
         std::ostringstream ss;
@@ -121,11 +151,11 @@ namespace GitAne::Net
 
         int bytesReceived;
         while(true){
-            acceptConnection(new_socket); // va attendre que quelqu'un se log
+            acceptConnection(new_socket); // va attendre que quelqu'un ce log
             char buffer[BUFFER_SIZE] = {0}; // l'erreur c'est un 'may' qui se produit pas car la constante est bien set dans le constructeur.
             bytesReceived = read(new_socket,buffer,BUFFER_SIZE); // les infos qu'il a donné
             if(bytesReceived < 0) {
-                std::cout << "ERREUR: Bytes reçues invalides.";
+                std::cout << "[!] Bytes reçues invalides.";
                 return; // le serveur arrête de lire les requêtes.
             }
             std::ostringstream ss;
@@ -134,8 +164,14 @@ namespace GitAne::Net
             auto [method,url] = urlAndMethod(buffer);
             std::string params = extractGitParams(buffer);
             std::function<std::string(std::string method, std::string args)> associatedFun = urlTree.getActionForUrl(url);
-            if(associatedFun == nullptr) sendResponse(buildNotFoundPage("GitÂne - Lost","You lost the game."));
-            else sendResponse((urlTree.getActionForUrl(url)) (method,params));
+            if(associatedFun == nullptr) {
+                std::cout << "[!] URL not found: " << url << std::endl;
+                sendResponse(buildNotFoundPage("GitÂne - Lost","You lost the game."));
+            }
+            else {
+                std::cout << "[V] Request received on: " << url << std::endl;
+                sendResponse((urlTree.getActionForUrl(url)) (method,params));
+            }
             close(new_socket);
         }
 
@@ -155,5 +191,4 @@ namespace GitAne::Net
         }
         return;
     }
-
 }

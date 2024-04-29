@@ -14,8 +14,22 @@
 #include <string>
 #include <sys/socket.h>
 #include "url_tree.hpp"
+#include <filesystem>
 #include <arpa/inet.h> // inet passe d'un char* à un int
 #include "http_subsystems/login_and_register.hpp"
+#include "http_subsystems/file_transfer.hpp"
+#include <string>
+#include <map>
+#include <vector>
+#include <filesystem>
+#include <stdexcept>
+#include <iostream>
+#include <fstream>
+#include <zlib.h>
+#include <unordered_map>
+#include <set>
+
+
 namespace GitAne::Net
 {    
     
