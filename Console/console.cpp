@@ -5,7 +5,7 @@ using namespace std;
 #include <vector>
 #include "../Git/classes.hpp"
 
-#include "Plugins/plugin_loader.hpp"
+#include "../Plugins/plugin_loader.hpp"
 
 #include <ostream>
 namespace Color {
