@@ -1,4 +1,5 @@
 #include "file_transfer.hpp"
+#include "response_builder.hpp"
 #include <fstream>
 
 using json = nlohmann::json;
@@ -9,7 +10,10 @@ namespace GitAne::Net
 std::string buildReceiveFileResponse(std::string method, std::string args){
     /*
     \brief permet au serveur de recevoir des fichiers.
+    \brief c'est la réponse à "send" !
     */
+    std::cout << "HEY !";
+    
     auto maps= parseQueryString(args);
     bool contiens_token = maps.find("token") != maps.end();
     if(!contiens_token){
@@ -28,11 +32,25 @@ std::string buildReceiveFileResponse(std::string method, std::string args){
     if(!contiens_content){
         return buildBadRequestPage("File receiver","missing arguments, need <em>file_content</em>");
     }
-
-    std::ofstream to_write("./bdd/gacs/" + maps["proj_name"] + "/" +  maps["file_name"]);
+    std::cout << "AAA";
+    
+    if (!fs::is_directory("./bdd/gacs/" + maps["proj_name"]) || !fs::exists("./bdd/gacs/" + maps["proj_name"])) { // Check if src folder exists
+        std::cout << "Le dossier n'existait pas !" << std::endl;
+        fs::create_directory("./bdd/gacs/" + maps["proj_name"]); // create src folder
+    }
+    else{
+        std::cout << "Le dossier existait bien."  << std::endl;
+    }
+    std::ofstream to_write("./bdd/gacs/" + maps["proj_name"] + "/" +  maps["file_name"],std::ios::out);
+    if(to_write.is_open()){
+        std::cout << "bien ouvert !";
     to_write << maps["file_content"];
     to_write.close();
-    buildOkPage("File Sender", maps["file_name"] + " updated.");
+    return buildOkPage("File Sender", maps["file_name"] + " updated.");
+    }
+    else{
+        return buildInternalServerErrorPage("File Sender", "On a eu un pb la.");
+    }
 
 }
 
@@ -40,6 +58,7 @@ std::string buildSendFileResponse(std::string method, std::string args){
     /*
     \brief Permet au serveur d'envoyer des fichiers.
     */
+    return "bite";
 }
 
 std::string buildLaMuleResponse(std::string method, std::string args){

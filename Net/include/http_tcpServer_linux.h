@@ -13,7 +13,6 @@
 #include <netinet/in.h>
 #include <string>
 #include <sys/socket.h>
-#include "url_tree.hpp"
 #include <filesystem>
 #include <arpa/inet.h> // inet passe d'un char* à un int
 #include "http_subsystems/login_and_register.hpp"
@@ -62,7 +61,7 @@ namespace GitAne::Net
 
     /* Gestion des Plug-ins */
     private:
-        UrlTree urlTree;
+         std::unordered_map<std::string, std::function<std::string(std::string, std::string)>> urlMap;
 
 
 

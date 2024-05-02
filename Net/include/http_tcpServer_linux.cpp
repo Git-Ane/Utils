@@ -61,13 +61,13 @@ namespace GitAne::Net{
         sockAddr.sin_port = htons(p); // passage en big-endian
         sockAddr.sin_addr.s_addr = inet_addr(d.c_str());
         // La c'est important !
-        urlTree = UrlTree(); // Le serveur a un UrlTree qui lui sert à savoir comment rediriger selon l'url (serveur/login ou serveur/git/commit, etc).
-        urlTree.addPath("/", buildDefaultResponse);
-        urlTree.addPath("/login", buildLoginResponse);
-        urlTree.addPath("/register", buildRegisterResponse);
-        urlTree.addPath("/lamule/send",buildSendFileResponse);
-        urlTree.addPath("/lamule/receive",buildReceiveFileResponse);
-        urlTree.addPath("/lamule",buildLaMuleResponse);
+        urlMap =  std::unordered_map<std::string, std::function<std::string(std::string, std::string)>>();; // Le serveur a un UrlTree qui lui sert à savoir comment rediriger selon l'url (serveur/login ou serveur/git/commit, etc).
+        urlMap["/"] =  buildDefaultResponse;
+        urlMap["/login"] =  buildLoginResponse;
+        urlMap["/register"]= buildRegisterResponse;
+        urlMap["/lamule/receive"]=buildSendFileResponse;
+        urlMap["/lamule/send"]=buildReceiveFileResponse;
+        urlMap["/lamule"]=buildLaMuleResponse;
         start();
     }
 
@@ -163,14 +163,19 @@ namespace GitAne::Net{
             std::cout << ss.str();
             auto [method,url] = urlAndMethod(buffer);
             std::string params = extractGitParams(buffer);
-            std::function<std::string(std::string method, std::string args)> associatedFun = urlTree.getActionForUrl(url);
+            std::function<std::string(std::string method, std::string args)> associatedFun = urlMap[url];
             if(associatedFun == nullptr) {
                 std::cout << "[!] URL not found: " << url << std::endl;
                 sendResponse(buildNotFoundPage("GitÂne - Lost","You lost the game."));
             }
             else {
                 std::cout << "[V] Request received on: " << url << std::endl;
-                sendResponse((urlTree.getActionForUrl(url)) (method,params));
+                for (const auto& pair : urlMap) {
+                    std::cout << "Clé : " << pair.first << ", Valeur : " << "non" << std::endl;
+                }
+                auto f =urlMap[url]; 
+                std::cout << "Toujurs la";
+                sendResponse(f(method,params));
             }
             close(new_socket);
         }
@@ -178,9 +183,11 @@ namespace GitAne::Net{
     }
 
     void TcpServer::sendResponse(std::string msg) {
+        std::cout<< "Avant d'écrit\n";
         long bytesSent;
+        
         bytesSent = write(new_socket, msg.c_str(), msg.size());
-
+         std::cout<< "Après d'écrit\n";
         if ((long unsigned int)bytesSent == msg.size())
         {
             std::cout << "Response of the server: " << msg.c_str() << endl;
