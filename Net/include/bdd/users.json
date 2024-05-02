@@ -1,5 +1,9 @@
 {
   "ddd": "eee",
+  "test@test.com": {
+    "pwd": "testest",
+    "tok": "test@test.comtestest"
+  },
   "test@test.com2": {
     "pwd": "testest",
     "tok": "test@test.com2testest"

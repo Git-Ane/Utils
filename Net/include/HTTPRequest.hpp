@@ -9,6 +9,7 @@
 #include <functional>
 #include <memory>
 #include <stdexcept>
+#include <sys/types.h>
 #include <system_error>
 #include <map>
 #include <string>
@@ -16,6 +17,7 @@
 #include <cctype>
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 
 #ifdef _WIN32
 #  pragma push_macro("WIN32_LEAN_AND_MEAN")
@@ -380,25 +382,22 @@ namespace http
             return send(method, body, headers);
         }
 
-        Response send(const std::string& method = "GET",
+        std::string send_hotfix(const std::string& method = "GET",
                       const std::string& body = "",
                       const std::vector<std::string>& headers = {})
         {
             Response response;
-
             if (scheme != "http")
                 throw RequestError("Only HTTP scheme is supported");
 
             addrinfo hints = {};
             hints.ai_family = getAddressFamily(internetProtocol);
             hints.ai_socktype = SOCK_STREAM;
-
             addrinfo* info;
             if (getaddrinfo(domain.c_str(), port.c_str(), &hints, &info) != 0)
                 throw std::system_error(getLastError(), std::system_category(), "Failed to get address info of " + domain);
 
             std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> addressInfo(info, freeaddrinfo);
-
             Socket socket(internetProtocol);
 			
             // take the first address from the list
@@ -406,7 +405,6 @@ namespace http
                 throw std::system_error(getLastError(), std::system_category(), "Failed to connect to " + domain + ":" + port);
 
             std::string requestData = method + " " + path + " HTTP/1.1\r\n";
-
             for (const std::string& header : headers)
                 requestData += header + "\r\n";
 
@@ -415,7 +413,6 @@ namespace http
 
             requestData += "\r\n";
             requestData += body;
-
 #if defined(__APPLE__) || defined(_WIN32)
             constexpr int flags = 0;
 #else
@@ -429,7 +426,6 @@ namespace http
             auto remaining = static_cast<ssize_t>(requestData.size());
             ssize_t sent = 0;
 #endif
-
             // send the request
             while (remaining > 0)
             {
@@ -452,28 +448,114 @@ namespace http
             bool chunkedResponse = false;
             size_t expectedChunkSize = 0;
             bool removeCrlfAfterChunk = false;
-
             // read the response
             for (;;)
             {
                 const auto size = recv(socket, reinterpret_cast<char*>(tempBuffer), sizeof(tempBuffer), flags);
+                if (size < 0)
+                    throw std::system_error(getLastError(), std::system_category(), "Failed to read data from " + domain + ":" + port);
+                else if (size == 0){
+                    break; // disconnected
+                }
+                responseData.insert(responseData.end(), tempBuffer, tempBuffer + size);
+            }
+            std::string resp (responseData.begin(),responseData.end());
+            return resp;
+        }
 
+        Response send(const std::string& method = "GET",
+                      const std::string& body = "",
+                      const std::vector<std::string>& headers = {})
+        {
+            Response response;
+            std::cout << "Coucou" << std::endl;
+            if (scheme != "http")
+                throw RequestError("Only HTTP scheme is supported");
+
+            addrinfo hints = {};
+            hints.ai_family = getAddressFamily(internetProtocol);
+            hints.ai_socktype = SOCK_STREAM;
+            std::cout << "Coucou2" << std::endl;
+
+            addrinfo* info;
+            if (getaddrinfo(domain.c_str(), port.c_str(), &hints, &info) != 0)
+                throw std::system_error(getLastError(), std::system_category(), "Failed to get address info of " + domain);
+
+            std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> addressInfo(info, freeaddrinfo);
+            std::cout << "Coucou3" << std::endl;
+            Socket socket(internetProtocol);
+			
+            // take the first address from the list
+            if (::connect(socket, addressInfo->ai_addr, static_cast<socklen_t>(addressInfo->ai_addrlen)) < 0)
+                throw std::system_error(getLastError(), std::system_category(), "Failed to connect to " + domain + ":" + port);
+
+            std::string requestData = method + " " + path + " HTTP/1.1\r\n";
+            std::cout << "Coucou4" << std::endl;
+            for (const std::string& header : headers)
+                requestData += header + "\r\n";
+
+            requestData += "Host: " + domain + "\r\n";
+            requestData += "Content-Length: " + std::to_string(body.size()) + "\r\n";
+
+            requestData += "\r\n";
+            requestData += body;
+#if defined(__APPLE__) || defined(_WIN32)
+            constexpr int flags = 0;
+#else
+            constexpr int flags = MSG_NOSIGNAL;
+#endif
+
+#ifdef _WIN32
+            auto remaining = static_cast<int>(requestData.size());
+            int sent = 0;
+#else
+            auto remaining = static_cast<ssize_t>(requestData.size());
+            ssize_t sent = 0;
+#endif
+            // send the request
+            while (remaining > 0)
+            {
+                const auto size = ::send(socket, requestData.data() + sent, static_cast<size_t>(remaining), flags);
+
+                if (size < 0)
+                    throw std::system_error(getLastError(), std::system_category(), "Failed to send data to " + domain + ":" + port);
+
+                remaining -= size;
+                sent += size;
+            }
+
+            uint8_t tempBuffer[4096];
+            constexpr uint8_t crlf[] = {'\r', '\n'};
+            std::vector<uint8_t> responseData;
+            bool firstLine = true;
+            bool parsedHeaders = false;
+            bool contentLengthReceived = false;
+            unsigned long contentLength = 0;
+            bool chunkedResponse = false;
+            size_t expectedChunkSize = 0;
+            bool removeCrlfAfterChunk = false;
+            std::cout << "Coucou7" << std::endl;
+            // read the response
+            for (;;)
+            {
+                const auto size = recv(socket, reinterpret_cast<char*>(tempBuffer), sizeof(tempBuffer), flags);
                 if (size < 0)
                     throw std::system_error(getLastError(), std::system_category(), "Failed to read data from " + domain + ":" + port);
                 else if (size == 0)
+                    std::cout << "fini déjà";
                     break; // disconnected
 
                 responseData.insert(responseData.end(), tempBuffer, tempBuffer + size);
 
                 if (!parsedHeaders)
                 {
+                    std::cout << "la";
                     for (;;)
                     {
                         const auto i = std::search(responseData.begin(), responseData.end(), std::begin(crlf), std::end(crlf));
 
                         // didn't find a newline
-                        if (i == responseData.end()) break;
-
+                        if (i == responseData.end()) {std::cout << "break";break;}
                         const std::string line(responseData.begin(), i);
                         responseData.erase(responseData.begin(), i + 2);
 
@@ -546,6 +628,7 @@ namespace http
                     }
                 }
 
+                std::cout << "Coucou8" << std::endl;
                 if (parsedHeaders)
                 {
                     // Content-Length must be ignored if Transfer-Encoding is received
@@ -607,9 +690,11 @@ namespace http
                     }
                 }
             }
-
+            std::cout << "Coucou9" << std::endl;
             return response;
         }
+
+        
 
     private:
 #ifdef _WIN32

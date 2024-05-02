@@ -183,7 +183,7 @@ namespace GitAne::Net{
 
         if ((long unsigned int)bytesSent == msg.size())
         {
-            std::cout << ("------ Server Response sent to client ------\n\n");
+            std::cout << "Response of the server: " << msg.c_str() << endl;
         }
         else
         {
