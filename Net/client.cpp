@@ -1,5 +1,4 @@
 #include "include/HTTPRequest.hpp"
-#include "client.hpp"
 #include<iostream>
 #include "string.h"
 #include <unordered_map>
@@ -130,3 +129,4 @@ class NetClient {
 
 int main(){
     GitAne::NetClient cTest("http://127.0.0.1:8087","test@test.com","testest");
+}
