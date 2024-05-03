@@ -456,6 +456,11 @@ namespace GitAne{
             cout << "File " << it.first << endl;
             if(it.first[0]!='#'){
                 string s = read_object(repo,it.second);
+                fs::path dir_path = fs::path(it.first).parent_path();
+                if (!fs::exists(dir_path)) {
+                    fs::create_directories(dir_path);
+                    std::cout << "Directories created: " << dir_path << std::endl;
+                }
                 ofstream f(it.first);
                 f << s;
                 f.close();
@@ -467,11 +472,14 @@ namespace GitAne{
         }
         for (string& element : tracked){    //les fichiers qui sont suivis mais pas dans le commit ou on checkout on les supprime
             if (still_exist.find(element) == still_exist.end() && !shouldIgnoreFile(element,ignorePatterns)){
-                cout << "File " << element << " doesn't exist" << endl << "Do you want to remove it ? [y/n] "; 
-                //je demande mais on va pt enlever ca en vrai
-                string rep;
-                cin>>rep;
-                if(rep=="y"){fs::remove(element);}
+                fs::remove(element);
+                fs::path path = fs::path(element);
+                while (fs::exists(path.parent_path()) && fs::is_empty(path.parent_path()))
+                {
+                    path = path.parent_path();
+                    fs::remove(path);
+                }
+                
             }
         }
         set_head(repo,sha);
@@ -479,7 +487,6 @@ namespace GitAne{
         cout << "=== END CHECKOUT COMMIT " + name + " ===" <<endl;
 
     }
-
 
     /*! \brief get le sha d'une position ecrite comprehensiblement (genre HEAD-2 ou main)
     */
@@ -499,7 +506,7 @@ namespace GitAne{
         }
         else if(pos.substr(0,5)=="HEAD-"){
             int i = stoi(pos.substr(5,pos.size()-5));
-            sha = get_head(repo,false);
+            sha = get_head(repo,true);
             for (int a=0;a<i;a++){
                 sha = get_parent(repo,sha);
                 if(sha=="none"){throw(invalid_argument("You went too far back"));}
