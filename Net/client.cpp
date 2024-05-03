@@ -120,6 +120,11 @@ class NetClient {
             auto resSend = parseHTTPResponse(sendResponse);
             cout << "Réponse du send file: " << sendResponse;
             
+            /* Recevoir un fichier */
+            http::Request requestRec(s + "/lamule/receive");
+            auto recResponse = requestRec.send_hotfix("POST", "[GITPARAM]token="+token+"&proj_name=gang"+"&file_name=caca", {"Content-Type: application/x-www-form-urlencoded"});
+            auto resRec = parseHTTPResponse(recResponse);
+            cout << "Réponse du receive file: " << recResponse;
 
         }
 
