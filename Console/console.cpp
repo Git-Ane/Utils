@@ -75,7 +75,8 @@ namespace GitAne{
         }
 
         void repo_init(vector<string> _){
-            GitAne::create_repo(fs::current_path());
+            GitRepo repo = GitAne::create_repo(fs::current_path());
+            write_commit("initial_commit", false, "");
         }
 
         void write_commit_fun(vector<string> args){
