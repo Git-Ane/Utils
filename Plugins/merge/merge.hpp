@@ -27,6 +27,7 @@ namespace GitAne{
         void remove_merge(string hash);
         void validate_and_merge(const string& target_branch);
         void check_merge_conflicts(const string&);
+        bool try_to_merge(string sha_a, string sha_b, string sha_lca, fs::path file_name);
         void merge_plugin_loader();
     }
 

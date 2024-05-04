@@ -13,6 +13,19 @@ namespace GitAne{
             }
             string current_branch_hash = get_head(r,true);
             string target_branch_hash = get_hash_of_branch(target_branch, true);
+            set<string> current_history;
+            string h = current_branch_hash;
+            while (h != "none"){
+                current_history.insert(h);
+                h = get_parent(r,h);
+            }
+            h = target_branch_hash;
+            string lca_hash;
+            while (current_history.find(h) == current_history.end()){
+                h = get_parent(r,h);
+            }
+            lca_hash = h;
+            cout << "Ancetre commun : " << lca_hash << endl;
             if(!fs::exists(r.get_gitdir() / "merge")){
                 create_dir(r.get_gitdir() / "merge");
             }
@@ -47,11 +60,12 @@ namespace GitAne{
 
             unordered_map<string, string> current_files = open_commit(r,current_branch_hash);
             unordered_map<string, string> target_files = open_commit(r,target_branch_hash);
+            unordered_map<string, string> lca_files = open_commit(r,lca_hash);
 
             for (const auto& current_file : current_files) {
                 if (target_files.find(current_file.first) != target_files.end() && current_file.first[0] != '#') {
                     // Le fichier est présent dans les deux branches, vérifier s'il y a un conflit
-                    if (current_file.second != target_files[current_file.first]) {
+                    if (!try_to_merge(current_file.second, target_files[current_file.first], lca_files[current_file.first], current_file.first)) {
                         /*
                             Ajouter la v.2
                         */
@@ -126,9 +140,24 @@ namespace GitAne{
             return;
         }
 
+    bool try_to_merge(string sha_a, string sha_b, string sha_lca, fs::path file_name){
+        cout << "trying to merge " << sha_a << " " << sha_b << " " << sha_lca << endl;
+        if(sha_a == sha_b){return true;}
+        if(sha_b == sha_lca){return true;}
+        if(sha_a == sha_lca){
+            GitRepo r = repo_find("");
+            string content = read_object(r,sha_b, false);
+            ofstream f(file_name);
+            f << content;
+            f.close();
+            return true;
+        }
+        return false;
+    }
+
     void remove_merge(void){
             GitRepo r = repo_find("");
-            if(filesystem::remove_all(r.get_gitdir() / "merge") != 0){
+            if(filesystem::remove_all(r.get_gitdir() / "merge") == 0){
                 cerr << "Erreur lors de la suppression du merge. Peut-être que le dossier n'existait déjà plus ?" << endl;
                 return;
             }

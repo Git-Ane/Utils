@@ -457,7 +457,8 @@ namespace GitAne{
             if(it.first[0]!='#'){
                 string s = read_object(repo,it.second);
                 fs::path dir_path = fs::path(it.first).parent_path();
-                if (!fs::exists(dir_path)) {
+                if (!fs::exists(dir_path) && dir_path != "") {
+                    cout << "directory " << dir_path << endl;
                     fs::create_directories(dir_path);
                     std::cout << "Directories created: " << dir_path << std::endl;
                 }
