@@ -234,6 +234,8 @@ namespace GitAne{
     bool isHidden(const fs::path& path);
     vector<string> listFiles();
 
+    void move_branch();
+
 
     /* Idée:
     - Le serveur stocke tout le contenu du fichier

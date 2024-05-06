@@ -853,4 +853,29 @@ namespace GitAne{
     }
 
 
+    void move_branch(){     //ca peut etre tres tres chiant a synchro avec le serveur
+        GitRepo repo = repo_find("");
+        if(made_changes(repo)){
+            cout << "Commit your changes before you move a branch" << endl;
+            return;
+        }
+        string active_branch = get_active_branch(repo);
+        cout << "The active branch " << active_branch << " will be moved to the position of HEAD" << endl << "Do you want to continue ? [y/n] ";
+        string rep;
+        cin >> rep;
+        if(rep!="y"){
+            return;
+        }
+        string head_sha = get_head(repo,true);
+        unordered_map<string,string> branches = get_branches(repo);
+        branches[active_branch] = head_sha;
+        ofstream branch_file(repo.get_gitdir() / "branches");
+        branch_file << kvlm_serialize(branches);
+        branch_file.close();
+
+        cout << "Successfully moved branch " << active_branch << endl;
+        
+    }
+
+
 }
