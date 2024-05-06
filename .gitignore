@@ -19,3 +19,7 @@ Net/test_json.cpp
 Console/build
 Net/build/GitAneServer
 build/GitAneConsole
+
+
+Net/build/*
+Net/client
