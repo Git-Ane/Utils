@@ -86,8 +86,14 @@ namespace GitAne{
         void list_branches_fun(vector<string>){
             GitRepo repo = repo_find("");
             unordered_map<string,string> k = get_branches(repo);
+            string active_branch = get_active_branch(repo);
             for (auto& it: k){
-                cout << it.first << endl;
+                if(it.first == active_branch){
+                    cout << it.first << " <-- active branch" << endl;
+                }
+                else{
+                    cout << it.first << endl;
+                }
             }
         }
 
