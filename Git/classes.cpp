@@ -635,12 +635,6 @@ namespace GitAne{
     string GitCommit::get_format(){
         return "commit";
     }
-    string GitTree::get_format(){
-        return "tree";
-    }
-    string GitTag::get_format(){
-        return "tag";
-    }
 
     void GitObject::init(){
 
@@ -743,13 +737,6 @@ namespace GitAne{
         kvlm = kvlm_parse(data);
     }
 
-    string GitTag::serialize(GitRepo repo){}
-
-    void GitTag::deserialize(string data){}
-
-    string GitTree::serialize(GitRepo repo){}
-
-    void GitTree::deserialize(string data){}
 
     string read_object(GitRepo repo, string sha, bool write) { // Essayer avec ça. Si ça marhe pas, las passer en void, la faire prendre un GitObject* et le set dedans. On peut faire une variable qui indique le type et très facilement vérifeir le type de la variable de retour avec un Switch.        /*
         /*
