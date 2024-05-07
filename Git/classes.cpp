@@ -877,5 +877,32 @@ namespace GitAne{
         
     }
 
+    void delete_branch(string branch_name){
+        GitRepo repo = repo_find("");
+        string active_branch = get_active_branch(repo);
+        if(branch_name == active_branch){
+            cout << "You can't delete the active_branch" << endl;
+            return;
+        }
+        unordered_map<string,string> branches = get_branches(repo);
+        if(branches.find(branch_name) == branches.end()){
+            cout << "The branch " << branch_name << " doesn't exist" << endl;
+            return;
+        }
+        cout << "The branch " << branch_name << " will be deleted" << endl << "Do you want to continue ? [y/n] ";
+        string rep;
+        cin >> rep;
+        if(rep!="y"){
+            return;
+        }
+        branches.erase(branch_name);
+        ofstream branch_file(repo.get_gitdir() / "branches");
+        branch_file << kvlm_serialize(branches);
+        branch_file.close();
+
+        cout << "Successfully deleted branch " << branch_name << endl;
+        
+    }
+
 
 }

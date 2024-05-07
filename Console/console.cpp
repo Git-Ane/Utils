@@ -95,6 +95,10 @@ namespace GitAne{
             move_branch();
         }
 
+        void delete_branch_fun(vector<string> args){
+            delete_branch(args[0]);
+        }
+
     }
 }
 
@@ -116,6 +120,7 @@ int main(int argc, char* argv[]) {
     addCommand("status",&status,"show history",0,0);
     addCommand("list_branches",&list_branches_fun,"list the branches of the GitAne repo",0,0);
     addCommand("move_branch",&move_branch_fun,"move the active branch to the position of HEAD",0,0);
+    addCommand("delete_branch",&delete_branch_fun,"delete branch arg1",1,1);
     plugin_loader();
 
     unsigned int i; 

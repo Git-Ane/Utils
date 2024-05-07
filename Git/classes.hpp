@@ -235,6 +235,7 @@ namespace GitAne{
     vector<string> listFiles();
 
     void move_branch();
+    void delete_branch(string branch_name);
 
 
     /* Idée:
