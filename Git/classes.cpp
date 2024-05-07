@@ -4,6 +4,8 @@
 #include <string>
 #include <unordered_map>
 
+#define GACOBJLEN 13
+
 using namespace std;
 namespace fs = std::filesystem;
 using namespace GitAne;
@@ -902,6 +904,50 @@ namespace GitAne{
 
         cout << "Successfully deleted branch " << branch_name << endl;
         
+    }
+
+
+    void clean(){
+        GitRepo repo = repo_find("");
+        unordered_map<string,string> branches = get_branches(repo);
+        set<string> saved;
+        vector<string> todo;
+        int deleted_cpt = 0;
+        for (auto& it: branches){
+            todo.push_back(it.second);
+        }
+        while(!todo.empty()){
+            string commit_sha = todo[todo.size()-1];
+            todo.pop_back();
+            saved.insert(commit_sha);
+            unordered_map<string,string> commit_files = open_commit(repo,commit_sha);
+            for (auto& it: commit_files){
+                if(it.first[0]!='#'){
+                    saved.insert(it.second);
+                }
+            }
+            if(commit_files["#parent"] != "none"){
+                todo.push_back(commit_files["#parent"]);
+            }
+            if(commit_files.find("#second_parent") != commit_files.end()){
+                todo.push_back(commit_files["#second_parent"]);
+            }
+        }
+
+        for (const auto& entry : fs::recursive_directory_iterator(".gac/objects/")) {
+            string entrypath = entry.path().string();
+            if(entrypath.size() == GACOBJLEN+2){
+                continue;
+            }
+            string sha = entrypath.substr(GACOBJLEN,2) + entrypath.substr(GACOBJLEN+3,38);
+            if(saved.find(sha) == saved.end()){
+                fs::remove(entrypath);
+                cout << entrypath << " deleted" << endl;
+                deleted_cpt++;
+            }
+        }
+
+        cout << "Clean complete!" << endl << deleted_cpt << " files have been deleted" << endl;
     }
 
 

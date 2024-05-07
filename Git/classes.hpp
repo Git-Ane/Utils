@@ -236,6 +236,7 @@ namespace GitAne{
 
     void move_branch();
     void delete_branch(string branch_name);
+    void clean();
 
 
     /* Idée:
