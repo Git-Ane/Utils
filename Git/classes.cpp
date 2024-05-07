@@ -421,7 +421,7 @@ namespace GitAne{
         GitRepo repo = repo_find("");
         string sha = sha_of_position(repo,args[0]);
         string sha_head = get_head(repo,false);
-        if(sha_head == sha){
+        if(sha_head == sha && !made_changes(repo)){
             cout << "You are already at head" << endl;
             if(args[0].substr(0,4)!="HEAD"){set_active_branch(repo,args[0]);}
             return;
