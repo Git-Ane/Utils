@@ -11,7 +11,7 @@ namespace GitAne{
     namespace Online{
         void connect();
         void add();
-        void remove();
+        void remove_server();
         void online_plugin_loader();
     }
 
