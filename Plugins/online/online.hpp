@@ -9,9 +9,9 @@
 namespace GitAne{
 
     namespace Online{
-        void connect();
-        void add();
-        void remove_server();
+        void connect(vector<string> arg);
+        void add(vector<string> arg);
+        void remove_server(vector<string> arg);
         void online_plugin_loader();
     }
 
