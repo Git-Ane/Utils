@@ -1,15 +1,13 @@
 #include "include/HTTPRequest.hpp"
 #include<iostream>
 #include "string.h"
+#include "client.hpp"
 #include <unordered_map>
 using namespace std;
 
 namespace GitAne{
 
-class NetClient {
-    public:
-        string server_url;
-        std::unordered_map<std::string, std::string> parseHTTPResponse(const std::string& httpResponse) {
+        unordered_map<std::string, std::string> NetClient::parseHTTPResponse(const std::string& httpResponse) {
             std::unordered_map<std::string, std::string> result;
 
             // Trouver la position de la première ligne vide (marquant la fin des en-têtes HTTP)
@@ -44,7 +42,7 @@ class NetClient {
             return result;
         }
 
-        std::unordered_map<std::string, std::string> body_to_args(const std::string& body) {
+        unordered_map<std::string, std::string> NetClient::body_to_args(const std::string& body) {
             std::unordered_map<std::string, std::string> args;
 
             // Trouver le contenu entre </h1> et </body>
@@ -93,7 +91,7 @@ class NetClient {
 
             return args;
         }
-        NetClient(string s,string e, string m){
+        NetClient::NetClient(string s,string e, string m){
             server_url = s;
             email = e;
             cout << "Connexion à " << s << " en tant que " << e;
@@ -117,14 +115,14 @@ class NetClient {
 
         }
 
-        std::unordered_map<std::string, std::string> sendFile(string proj_name, string file_name, string file_content){
+        std::unordered_map<std::string, std::string> NetClient::sendFile(string proj_name, string file_name, string file_content){
             http::Request requestSend(server_url + "/lamule/send");
             auto sendResponse = requestSend.send_hotfix("POST", "[GITPARAM]token="+token+"&proj_name="+proj_name+"&file_name="+file_name+"&file_content="+file_content, {"Content-Type: application/x-www-form-urlencoded"});
             auto resSend = parseHTTPResponse(sendResponse);
             return resSend;
         }
 
-        std::unordered_map<std::string, std::string> receiveFile(string proj_name, string file_name){
+        std::unordered_map<std::string, std::string> NetClient::receiveFile(string proj_name, string file_name){
             http::Request requestSend(server_url + "/lamule/receive");
             auto recResponse = requestSend.send_hotfix("POST", "[GITPARAM]token="+token+"&proj_name="+proj_name+"&file_name="+file_name, {"Content-Type: application/x-www-form-urlencoded"});
             auto resRec = parseHTTPResponse(recResponse);
@@ -148,17 +146,8 @@ class NetClient {
 
         
 
-        
-    private:
-        string token;
-        string email;
     
     
 
 };
 
-}
-
-int main(){
-    GitAne::NetClient cTest("http://127.0.0.1:8087","test@test.com","testest");
-}
