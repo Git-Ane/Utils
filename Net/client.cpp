@@ -91,26 +91,39 @@ namespace GitAne{
 
             return args;
         }
-        NetClient::NetClient(string s,string e, string m){
+        NetClient::NetClient(string s,string e, string m, bool reg){
             server_url = s;
             email = e;
+            token = "UNSET";
             cout << "Connexion à " << s << " en tant que " << e;
             
             // Demander au serveur de se connecter avec les informations données
             // En pratique il faudra demander une clé publique au serveur avant d'envoyer le MDP
-            http::Request request(s + "/register");
-            auto registerResponse = request.send_hotfix("POST", "[GITPARAM]name="+e+"&pwd="+m, {"Content-Type: application/x-www-form-urlencoded"});
-            auto resRegister = parseHTTPResponse(registerResponse);
-            cout << "Réponse du serveur:\n" << "Code d'erreur: " << resRegister["error_code"] << "\nTaille: " << resRegister["content_length"] << "\n Message: " << resRegister["response_body"] << endl;
-
-            http::Request requestLog(s + "/login");
-            auto loginresponse = requestLog.send_hotfix("POST", "[GITPARAM]name="+e+"&pwd="+m, {"Content-Type: application/x-www-form-urlencoded"});
-            auto resLogin = parseHTTPResponse(loginresponse);
-            cout << "Réponse du serveur:\n" << "Code d'erreur: " << resLogin["error_code"] << "\nTaille: " << resLogin["content_length"] << endl;
-            if(resLogin["error_code"] == "200"){
-                cout << "[*] Successfuly connected.";
+            if(reg){
+                http::Request request(s + "/register");
+                auto registerResponse = request.send_hotfix("POST", "[GITPARAM]name="+e+"&pwd="+m, {"Content-Type: application/x-www-form-urlencoded"});
+                auto resRegister = parseHTTPResponse(registerResponse);
+                cout << "Réponse du serveur:\n" << "Code d'erreur: " << resRegister["error_code"] << "\nTaille: " << resRegister["content_length"] << "\n Message: " << resRegister["response_body"] << endl;
+                if(resRegister["error_code"] == "200"){
+                    cout << "[*] Successfully registered." << endl;
+                    token ="OK";
+                }
+                else{
+                    cout << "[!] Can not register." << endl;
+                }
             }
-            else {cout << " [!] Failed to connect.";}
+            else{
+                http::Request requestLog(s + "/login");
+                auto loginresponse = requestLog.send_hotfix("POST", "[GITPARAM]name="+e+"&pwd="+m, {"Content-Type: application/x-www-form-urlencoded"});
+                auto resLogin = parseHTTPResponse(loginresponse);
+                cout << "Réponse du serveur:\n" << "Code d'erreur: " << resLogin["error_code"] << "\nTaille: " << resLogin["content_length"] << endl;
+                if(resLogin["error_code"] == "200"){
+                    cout << "[*] Successfuly connected.";
+                    token = "OK";
+                }
+                else {cout << " [!] Failed to connect.";}
+            }
+            
 
 
         }
