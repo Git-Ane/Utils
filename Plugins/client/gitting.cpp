@@ -5,7 +5,7 @@ namespace fs = std::filesystem;
 
 
 void copy_to_server(string proj_name){
-    GitAne::NetClient cTest("localhost:8087","test@test.com","testest");
+    GitAne::NetClient cTest("localhost:8087","test@test.com","testest", false);
     GitRepo repo = repo_find("");
     for (const auto& entry : fs::recursive_directory_iterator(repo.get_gitdir())){
         if(fs::is_regular_file(entry)){
