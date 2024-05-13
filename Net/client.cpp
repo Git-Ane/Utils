@@ -128,6 +128,22 @@ class NetClient {
 
         }
 
+        std::unordered_map<std::string, std::string> sendFile(string proj_name, string file_name, string file_content){
+            http::Request requestSend(server_url + "/lamule/send");
+            auto sendResponse = requestSend.send_hotfix("POST", "[GITPARAM]token="+token+"&proj_name="+proj_name+"&file_name="+file_name+"&file_content="+file_content, {"Content-Type: application/x-www-form-urlencoded"});
+            auto resSend = parseHTTPResponse(sendResponse);
+            return resSend;
+        }
+
+        std::unordered_map<std::string, std::string> receiveFile(string proj_name, string file_name){
+            http::Request requestSend(server_url + "/lamule/receive");
+            auto recResponse = requestSend.send_hotfix("POST", "[GITPARAM]token="+token+"&proj_name="+proj_name+"&file_name="+file_name, {"Content-Type: application/x-www-form-urlencoded"});
+            auto resRec = parseHTTPResponse(recResponse);
+            return resRec;
+        }
+
+        
+
 
 
 
