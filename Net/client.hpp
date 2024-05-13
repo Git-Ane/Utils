@@ -8,7 +8,7 @@ namespace GitAne{
 class NetClient {
     public:
         string server_url;
-        NetClient(string s,string e, string m, bool register);
+        NetClient(string s,string e, string m, bool reg);
         unordered_map<std::string, std::string> parseHTTPResponse(const std::string& httpResponse);
         unordered_map<std::string, std::string> body_to_args(const std::string& body);
         std::unordered_map<std::string, std::string> sendFile(string proj_name, string file_name, string file_content);
