@@ -94,6 +94,7 @@ namespace GitAne{
         NetClient::NetClient(string s,string e, string m, bool reg){
             server_url = s;
             email = e;
+            token = "UNSET";
             cout << "Connexion à " << s << " en tant que " << e;
             
             // Demander au serveur de se connecter avec les informations données
@@ -105,6 +106,7 @@ namespace GitAne{
                 cout << "Réponse du serveur:\n" << "Code d'erreur: " << resRegister["error_code"] << "\nTaille: " << resRegister["content_length"] << "\n Message: " << resRegister["response_body"] << endl;
                 if(resRegister["error_code"] == "200"){
                     cout << "[*] Successfully registered." << endl;
+                    token ="OK";
                 }
                 else{
                     cout << "[!] Can not register." << endl;
@@ -117,6 +119,7 @@ namespace GitAne{
                 cout << "Réponse du serveur:\n" << "Code d'erreur: " << resLogin["error_code"] << "\nTaille: " << resLogin["content_length"] << endl;
                 if(resLogin["error_code"] == "200"){
                     cout << "[*] Successfuly connected.";
+                    token = "OK";
                 }
                 else {cout << " [!] Failed to connect.";}
             }
