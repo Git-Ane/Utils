@@ -9,6 +9,7 @@ namespace GitAne{
         //GitAne::NetClient cTest("localhost:8087","test@test.com","testest");
         void log_fun(vector<string> args){
             GitAne::NetClient cTest(args[0],args[1],args[2]);
+            cTest.sendFile("caca","caca.txt","je suis un gros caca");
         }
 
 
