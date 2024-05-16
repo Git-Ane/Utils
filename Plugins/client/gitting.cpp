@@ -39,12 +39,24 @@ void push(string proj_name){
     string remote_branch = k[active_branch];
     cout << local_branch << " " << remote_branch << endl;
     vector<string> to_add;
-    while (local_branch != remote_branch)
-    {
-        to_add.push_back(local_branch);
-        local_branch = get_parent(repo,local_branch);
-        if(local_branch == "none"){throw(logic_error("Commits were made while you were away!"));}
+    if(remote_branch != ""){
+        while (local_branch != remote_branch)
+            {
+                to_add.push_back(local_branch);
+                local_branch = get_parent(repo,local_branch);
+                if(local_branch == "none"){throw(logic_error("Commits were made while you were away!"));}
+            }
     }
+    else{
+        while (true)        //tant que le fichier n'existe pas sur le serveur
+            {
+                to_add.push_back(local_branch);
+                local_branch = get_parent(repo,local_branch);
+                if(local_branch == "none"){throw(logic_error("Commits were made while you were away!"));}
+            }
+    }
+    
+    
 
     for (int i=to_add.size()-1;i>=0;i--){
         string sha = to_add[i];
