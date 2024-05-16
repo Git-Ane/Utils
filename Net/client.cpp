@@ -1,4 +1,5 @@
 #include "include/HTTPRequest.hpp"
+#include "include/http_subsystems/data_manipulations.hpp"
 #include<iostream>
 #include "string.h"
 #include "client.hpp"
@@ -80,8 +81,8 @@ namespace GitAne{
                 size_t separator_pos = line.find(":");
                 if (separator_pos != std::string::npos) {
                     // Extraire la clé et la valeur
-                    std::string key = line.substr(0, separator_pos);
-                    std::string value = line.substr(separator_pos + 1);
+                    std::string key = Net::url_decode(line.substr(0, separator_pos));
+                    std::string value = Net::url_decode(line.substr(separator_pos + 1));
 
                     // Ajouter la paire clé-valeur à l'unordered_map
                     args[key] = value;
