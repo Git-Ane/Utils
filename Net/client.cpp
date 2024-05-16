@@ -2,6 +2,8 @@
 #include<iostream>
 #include "string.h"
 #include "client.hpp"
+#include <curl/curl.h>
+#include <iostream>
 #include <unordered_map>
 using namespace std;
 
@@ -128,16 +130,38 @@ namespace GitAne{
 
         }
 
+
+
+
+        std::string url_encode(const std::string& decoded)
+        {
+            const auto encoded_value = curl_easy_escape(nullptr, decoded.c_str(), static_cast<int>(decoded.length()));
+            std::string result(encoded_value);
+            curl_free(encoded_value);
+            return result;
+        }
+
+        std::string url_decode(const std::string& encoded)
+        {
+            int output_length;
+            const auto decoded_value = curl_easy_unescape(nullptr, encoded.c_str(), static_cast<int>(encoded.length()), &output_length);
+            std::string result(decoded_value, output_length);
+            curl_free(decoded_value);
+            return result;
+        }
+
+
+
         std::unordered_map<std::string, std::string> NetClient::sendFile(string proj_name, string file_name, string file_content){
             http::Request requestSend(server_url + "/lamule/send");
-            auto sendResponse = requestSend.send_hotfix("POST", "[GITPARAM]token="+token+"&proj_name="+proj_name+"&file_name="+file_name+"&file_content="+file_content, {"Content-Type: application/x-www-form-urlencoded"});
+            auto sendResponse = requestSend.send_hotfix("POST", "[GITPARAM]token="+token+"&proj_name="+url_encode(proj_name)+"&file_name="+url_encode(file_name)+"&file_content="+url_encode(file_content), {"Content-Type: application/x-www-form-urlencoded"});
             auto resSend = parseHTTPResponse(sendResponse);
             return resSend;
         }
 
         std::unordered_map<std::string, std::string> NetClient::receiveFile(string proj_name, string file_name){
             http::Request requestSend(server_url + "/lamule/receive");
-            auto recResponse = requestSend.send_hotfix("POST", "[GITPARAM]token="+token+"&proj_name="+proj_name+"&file_name="+file_name, {"Content-Type: application/x-www-form-urlencoded"});
+            auto recResponse = requestSend.send_hotfix("POST", "[GITPARAM]token="+token+"&proj_name="+url_encode(proj_name)+"&file_name="+url_encode(file_name), {"Content-Type: application/x-www-form-urlencoded"});
             auto resRec = parseHTTPResponse(recResponse);
             return resRec;
         }

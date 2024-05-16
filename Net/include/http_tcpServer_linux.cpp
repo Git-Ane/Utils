@@ -169,12 +169,7 @@ namespace GitAne::Net{
                 sendResponse(buildNotFoundPage("GitÂne - Lost","You lost the game."));
             }
             else {
-                std::cout << "[V] Request received on: " << url << std::endl;
-                for (const auto& pair : urlMap) {
-                    std::cout << "Clé : " << pair.first << ", Valeur : " << "non" << std::endl;
-                }
                 auto f =urlMap[url]; 
-                std::cout << "Toujurs la";
                 sendResponse(f(method,params));
             }
             close(new_socket);
