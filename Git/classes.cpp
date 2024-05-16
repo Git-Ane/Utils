@@ -202,17 +202,8 @@ namespace GitAne{
 
         string content = obj.serialize(repo);
 
-        std::vector<unsigned char> result;
-        string fmt = obj.get_format();
-        result.insert(result.end(), fmt.begin(), fmt.end());
-        result.push_back(' '); // Space character
-        std::string lenStr = std::to_string(content.length());
-        result.insert(result.end(), lenStr.begin(), lenStr.end());
-        result.push_back('\0'); // Null character
-        result.insert(result.end(), content.begin(), content.end());
 
-        std::string resultString(result.begin(), result.end());
-        std::string hash = sha1(resultString);
+        std::string hash = sha1(content);
 
         fs::path git_objects_folder = repo.get_gitdir() / "objects" / hash.substr(0, 2);
         if (fs::exists(git_objects_folder)) {
@@ -224,7 +215,7 @@ namespace GitAne{
             create_dir(git_objects_folder);
         }
         ofstream f = create_file(git_objects_folder / hash.substr(2));
-        f << resultString; // Write the data to file
+        f << content; // Write the data to file
         f.close();
         return hash;
     }
@@ -745,40 +736,10 @@ namespace GitAne{
         */
         fs::path path = repo.get_gitdir() / "objects" / sha.substr(0, 2) / sha.substr(2, sha.size() - 2);
 
-        if (!(fs::exists(path))) {
-            throw invalid_argument(path.string() + " does not exist !");
-        }
-
-        ifstream file(path);
-        std::stringstream buffer;
-        buffer << file.rdbuf(); // Read the entire file into the stringstream buffer
-
-        std::string content = buffer.str(); // Convert the buffer to a string
-
-        if(write){
-            std::cout << "Content of the file:" << std::endl;
-            std::cout << content << std::endl;
-        }
-
-        file.close();
-
-        std::string raw = buffer.str();
-        // Read object type
-        size_t x = raw.find(' ');
-        std::string fmt = raw.substr(0, x);
-
-        // Read and validate object size
-        size_t y = raw.find('\x00', x);
-        int size = std::stoi(raw.substr(x, y - x));
-        if (static_cast<uLong>(size) != raw.size() - y - 1) {
-            throw std::runtime_error("Malformed object " + sha + ": bad length");
-        }
-
-        content = raw.substr(y + 1);
 
         // Pick constructor based on object type
         
-        return content;
+        return get_file_content(path);
         
     }
 
