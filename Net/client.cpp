@@ -120,7 +120,7 @@ namespace GitAne{
                 auto resLogin = parseHTTPResponse(loginresponse);
                 cout << "Réponse du serveur:\n" << "Code d'erreur: " << resLogin["error_code"] << "\nTaille: " << resLogin["content_length"] << endl;
                 if(resLogin["error_code"] == "200"){
-                    cout << "[*] Successfuly connected.";
+                    cout << "[*] Successfuly connected." << endl;
                     token = "OK";
                 }
                 else {cout << " [!] Failed to connect.";}
@@ -159,11 +159,11 @@ namespace GitAne{
             return resSend;
         }
 
-        std::unordered_map<std::string, std::string> NetClient::receiveFile(string proj_name, string file_name){
+        string NetClient::receiveFile(string proj_name, string file_name){
             http::Request requestSend(server_url + "/lamule/receive");
             auto recResponse = requestSend.send_hotfix("POST", "[GITPARAM]token="+token+"&proj_name="+url_encode(proj_name)+"&file_name="+url_encode(file_name), {"Content-Type: application/x-www-form-urlencoded"});
             auto resRec = parseHTTPResponse(recResponse);
-            return resRec;
+            return resRec["response_body"].substr(63,resRec["response_body"].size()-63-15);
         }
 
         
