@@ -1,5 +1,6 @@
 #include "login_and_register.hpp"
-
+#include "../../../SHA-warma/shawarma.hpp"
+#include <iostream>
 using json = nlohmann::json;
 namespace GitAne::Net
 {    
@@ -38,6 +39,8 @@ std::string buildLoginResponse(std::string method, std::string args){
         Default print for the API, accessible using only your domain name.
         It (will) print to you all the availables URLs & descriptors (according to the plug-ins).
         */
+
+        std::cout << "Arguments reçus: " << args << std::endl;
         auto maps= parseQueryString(args);
         bool contiens_name = maps.find("name") != maps.end();
         bool contiens_pwd = maps.find("pwd") != maps.end();
@@ -54,7 +57,7 @@ std::string buildLoginResponse(std::string method, std::string args){
             return buildUnauthorizedRequestPage("Register","username already taken");
         }
         else{
-            std::string token = username + pwd; // tema le token incroyable
+            std::string token = GitAne::Net::sha1(username + pwd); // tema le token incroyable
             data[username] = {
                 {"pwd",pwd},
                 {"tok",token}

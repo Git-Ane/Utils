@@ -1,10 +1,7 @@
-#ifndef CLIENT_HPP
-#define CLIENT_HPP
-
-
 #include "include/HTTPRequest.hpp"
 #include<iostream>
 #include "string.h"
+#include <unordered_map>
 using namespace std;
 
 namespace GitAne{
@@ -27,5 +24,3 @@ class NetClient {
 };
 
 }
-
-#endif

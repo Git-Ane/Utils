@@ -29,10 +29,10 @@ $(shell mkdir -p build/SHA-warma)
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ) -lssl -lcrypto -lz -lstdc++
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ) -lssl -lcrypto -lz -lstdc++ -lcurl
 
 build/%.o: %.cpp
-	$(CC) $(CFLAGS) -c $< -o $@ -lssl -lcrytpo -lz -lstdc++
+	$(CC) $(CFLAGS) -c $< -o $@ -lssl -lcrytpo -lz -lstdc++ -lcurl
 
 clean:
 	rm -rf build

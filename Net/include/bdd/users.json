@@ -1,5 +1,9 @@
 {
   "ddd": "eee",
+  "kaka@prout.com": {
+    "pwd": "prout22",
+    "tok": "8bd80d5c7d87da13e47d46b02bfeedaf210773cc"
+  },
   "test@test.com": {
     "pwd": "testest",
     "tok": "test@test.comtestest"
