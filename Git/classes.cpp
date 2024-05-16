@@ -356,6 +356,11 @@ namespace GitAne{
         if(temporary){k["#temporary"] = "true";}
         else{k["#temporary"] = "false";}
         if(second_parent != ""){k["#second_parent"] = second_parent;}
+
+
+        for(unsigned i=0;i<(GitAne::Console::commitfunctions).size();i++){
+            k = GitAne::Console::commitfunctions[i](k);
+        }
         
         cout << "=== START COMMIT ===" << endl;
         for (std::string& element : files) {

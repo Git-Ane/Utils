@@ -8,6 +8,7 @@ using namespace std;
 #include<string>
 #include <vector>
 #include <functional>
+#include <unordered_map>
 
 
 
@@ -60,6 +61,7 @@ namespace GitAne{
         /*! \brief The command list
         */
         extern vector<Command*> commandesvect;
+        extern vector<function <unordered_map <string,string> (unordered_map<string,string>)> > commitfunctions;
         extern string active_plugin_name;
 
         /*! \brief Add a Command to Command list
@@ -70,6 +72,7 @@ namespace GitAne{
         \param nbmaxarg maximum number of arguments
         */
         void addCommand(string name, void (*fonc) (vector<string>),string helpmess, unsigned int nbminarg, unsigned int nbmaxarg);
+        void addCommitFun(function <unordered_map <string,string> (unordered_map<string,string>)> f);
 
         void initPlugin(string plugin_name);
     

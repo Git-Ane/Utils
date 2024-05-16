@@ -78,6 +78,7 @@ namespace GitAne{
         /*! \brief The command list
         */
         vector<Command*> commandesvect;
+        vector<function <unordered_map <string,string> (unordered_map<string,string>)> > commitfunctions;
         string active_plugin_name = "";
 
 
@@ -92,6 +93,10 @@ namespace GitAne{
         */
         void addCommand(string name, void (*fonc) (vector<string>),string helpmess, unsigned int nbminarg, unsigned int nbmaxarg){
              commandesvect.push_back(new Command(name,active_plugin_name,fonc,helpmess,nbminarg,nbmaxarg));
+        }
+
+        void addCommitFun(function <unordered_map <string,string> (unordered_map<string,string>)> f){
+            commitfunctions.push_back(f);
         }
 
         /*! \brief Call first when loading a plugin
