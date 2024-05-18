@@ -26,6 +26,51 @@ void copy_to_server(string proj_name){
 }
 
 
+void pull(string proj_name){
+    GitRepo repo = repo_find("");
+    if(made_changes(repo)){throw(logic_error("Commit your changes before you pull!"));}
+    if((get_branches(repo)[get_active_branch(repo)]!=get_head(repo,true))){throw(logic_error("Can't pull in detached HEAD mode"));}
+
+    GitAne::NetClient cTest("localhost:8087","test@test.com","testest", false);
+    string active_branch = get_active_branch(repo);
+    string local_branch = get_branches(repo)[active_branch];
+    string branches = cTest.receiveFile(proj_name,convert_filename("branches"));
+    auto k = kvlm_parse(branches);
+    string remote_branch = k[active_branch];
+    if(remote_branch==""){throw(logic_error("This branch doesn't exist on the repo!"));}
+    cout << local_branch << " " << remote_branch << endl;
+
+    vector<string> to_add;
+    while (local_branch != remote_branch)
+    {
+        to_add.push_back(remote_branch);
+        auto kc = kvlm_parse(cTest.receiveFile(proj_name,convert_filename(remote_branch)));
+        remote_branch = kc["#parent"];
+        if(remote_branch == "none"){throw(logic_error("Commits were made while you were away!"));}
+    }
+
+    for (int i=to_add.size()-1;i>=0;i--){
+        string sha = to_add[i];
+        string sc = cTest.receiveFile(proj_name,convert_filename("objects/"+sha.substr(0,2)+"/"+sha.substr(2,sha.size()-2)));
+        auto kc = kvlm_parse(sc);
+        for (auto it : k){
+            if(it.first[0]!= '#'){
+                string entrypath = "objects/"+it.second.substr(0,2)+"/"+it.second.substr(2,it.second.size()-2);
+                cout << it.second << endl;
+                string content = cTest.receiveFile(proj_name,convert_filename(entrypath));
+                GitBlob a_ajouter(content);
+                a_ajouter.deserialize(content);
+                write_to_git_object(repo,a_ajouter);
+            }
+        }
+        GitCommit c;
+        c.deserialize(sc);
+        write_to_git_object(repo,c);
+        cout << sha << endl;
+    }
+}
+
+
 void push(string proj_name){
     GitRepo repo = repo_find("");
     if(made_changes(repo)){throw(logic_error("Commit your changes before you push!"));}
