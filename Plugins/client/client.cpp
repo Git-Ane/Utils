@@ -21,12 +21,17 @@ namespace GitAne{
             push(args[0]);
         }
 
+        void pull_fun(vector<string> args){
+            pull(args[0]);
+        }
+
 
         void client_plugin_loader(){
             initPlugin("client");
             addCommand("log",&log_fun, "log to server",3,3);
             addCommand("cts",&copy_to_server_fun, "copy current git to server",1,1);
             addCommand("push",&push_fun, "push",1,1);
+            addCommand("pull",&pull_fun, "pull",1,1);
         }
     }
 }

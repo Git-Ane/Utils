@@ -25,7 +25,7 @@ namespace GitAne{
             buffer << file.rdbuf(); // Read the entire file into the stringstream buffer
             std::string content = buffer.str();
             blob.deserialize(content);
-            write_to_git_object(repo,blob); // Pass the pointer to blob
+            write_to_git_object(repo,blob,""); // Pass the pointer to blob
             cout << "File written successfully !" << endl;
             
         }

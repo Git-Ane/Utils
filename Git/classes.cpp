@@ -192,7 +192,7 @@ namespace GitAne{
     
 
 
-    string write_to_git_object(GitRepo repo, GitObject& obj) {
+    string write_to_git_object(GitRepo repo, GitObject& obj, string forcesha) {
         /*
         * Entrée: Réf d'un GitObj
         * Sortie: le sha
@@ -204,6 +204,7 @@ namespace GitAne{
 
 
         std::string hash = sha1(content);
+        if(forcesha!=""){hash = forcesha;}
 
         fs::path git_objects_folder = repo.get_gitdir() / "objects" / hash.substr(0, 2);
         if (fs::exists(git_objects_folder)) {
@@ -376,13 +377,13 @@ namespace GitAne{
 
             GitBlob a_ajouter(content);
             a_ajouter.deserialize(content); // si on le met pas ça met 0, faut vraiment utiliser full fonctions quand on utilise des réfs ...
-            string res_sha =  write_to_git_object(repo,a_ajouter);
+            string res_sha =  write_to_git_object(repo,a_ajouter, "");
             k.insert(std::make_pair(element, res_sha));
         }
         cout<<"Explored all files to add."<<endl;
         cout << "Writting the commit..." << endl;
         c.deserialize(kvlm_serialize(k));
-        string sha = write_to_git_object(repo,c);
+        string sha = write_to_git_object(repo,c,"");
         cout << "Changing HEAD..." << endl;
         set_head(repo,sha);
 
