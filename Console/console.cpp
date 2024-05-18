@@ -76,11 +76,11 @@ namespace GitAne{
 
         void repo_init(vector<string> _){
             GitRepo repo = GitAne::create_repo(fs::current_path());
-            write_commit("initial_commit", false, "");
+            write_commit("initial_commit", false, "", true);
         }
 
         void write_commit_fun(vector<string> args){
-            write_commit(args[0],false, "");
+            write_commit(args[0],false, "", false);
         }
 
         void list_branches_fun(vector<string>){

@@ -204,7 +204,7 @@ namespace GitAne{
         // Supprimer le fichier de verrouillage du merge
         fs::remove(r.get_gitdir() / "merge" / current_branch_hash);
         
-        write_commit("merge_commit",false, target_branch_hash);
+        write_commit("merge_commit",false, target_branch_hash, false);
 
         cout << "La fusion des branches AURAIT été effectuée avec succès. Mais il faut qu'on voit à deux pour qu'on soit d'accord." << endl;
         return;
