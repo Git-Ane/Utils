@@ -74,6 +74,7 @@ void pull(string proj_name){
         cout << "commit " << sha << endl;
     }
 
+    k = get_branches(repo);
     k[active_branch] = new_branch_sha;
     ofstream branch_file(repo.get_gitdir() / "branches");
     branch_file << kvlm_serialize(k);

@@ -424,7 +424,11 @@ namespace GitAne{
             return;
         }
         unordered_map<string,string> branches = get_branches(repo);
-        if(!(branches[get_active_branch(repo)]!=sha_head && sha_head != "none")){write_commit("temporary_commit",true,"");}
+        if(!(branches[get_active_branch(repo)]!=sha_head && sha_head != "none")){
+            if(made_changes(repo)){
+                write_commit("temporary_commit",true,"");
+            }
+        }
         else{cout<< "No temporary commit was made, because of detached HEAD mode" <<endl << branches[get_active_branch(repo)] << " " << sha_head << endl;}
         vector<string> tracked = get_tracked_files(repo);
         ofstream tracks_file(repo.get_gitdir() / "tracked");
