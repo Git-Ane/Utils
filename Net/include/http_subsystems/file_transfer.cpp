@@ -30,7 +30,19 @@ std::string buildReceiveFileResponse(std::string method, std::string args){
     if(!contiens_content){
         return buildBadRequestPage("File receiver","missing arguments, need <em>file_content</em>");
     }
-    
+    std::string token = maps["token"];
+    std::ifstream f("./include/bdd/users.json");
+    json data = json::parse(f);
+    bool logged = false;
+    for (auto it = data.begin(); it != data.end(); ++it) {
+        if(it.value()["token"] == token){
+            logged=true;
+            break;
+        }
+    }
+    if(!logged){
+        return buildInternalServerErrorPage("File Sender", "Wrong token.");
+    }
     if (!fs::is_directory("./bdd/gacs/" + maps["proj_name"]) || !fs::exists("./bdd/gacs/" + maps["proj_name"])) { // Check if src folder exists
         std::cout << "Le dossier n'existait pas !" << std::endl;
         fs::create_directory("./bdd/gacs/" + maps["proj_name"]); // create src folder
@@ -69,6 +81,20 @@ std::string buildSendFileResponse(std::string method, std::string args){
     bool contiens_nom = maps.find("file_name") != maps.end();
     if(!contiens_nom){
         return buildBadRequestPage("File sender","missing arguments, need <em>file_name</em>");
+    }
+
+    std::string token = maps["token"];
+    std::ifstream f("./include/bdd/users.json");
+    json data = json::parse(f);
+    bool logged = false;
+    for (auto it = data.begin(); it != data.end(); ++it) {
+        if(it.value()["token"] == token){
+            logged=true;
+            break;
+        }
+    }
+    if(!logged){
+        return buildInternalServerErrorPage("File Sender", "Wrong token.");
     }
     if (!fs::is_directory("./bdd/gacs/" + maps["proj_name"]) || !fs::exists("./bdd/gacs/" + maps["proj_name"])) { // Check if src folder exists
         std::cout << "Le dossier n'existait pas !" << std::endl;
