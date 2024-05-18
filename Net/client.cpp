@@ -167,6 +167,14 @@ namespace GitAne{
             return resRec["response_body"].substr(63,resRec["response_body"].size()-63-15);
         }
 
+
+        bool NetClient::file_exists(string proj_name, string file_name){
+            http::Request requestSend(server_url + "/lamule/receive");
+            auto recResponse = requestSend.send_hotfix("POST", "[GITPARAM]token="+token+"&proj_name="+url_encode(proj_name)+"&file_name="+url_encode(file_name), {"Content-Type: application/x-www-form-urlencoded"});
+            auto resRec = parseHTTPResponse(recResponse);
+            return resRec["error_code"]=="200";
+        }
+
         
 
 

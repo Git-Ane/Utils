@@ -18,6 +18,7 @@ class NetClient {
         unordered_map<std::string, std::string> body_to_args(const std::string& body);
         std::unordered_map<std::string, std::string> sendFile(string proj_name, string file_name, string file_content);
         string receiveFile(string proj_name, string file_name);
+        bool file_exists(string proj_name, string file_name);
     private:
         
         string email;

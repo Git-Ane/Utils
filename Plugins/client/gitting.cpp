@@ -110,9 +110,10 @@ void push(string proj_name){
             }
     }
     else{
-        while (true)        //tant que le fichier n'existe pas sur le serveur
+        while (!cTest.file_exists(proj_name,convert_filename("objects/"+local_branch.substr(0,2)+"/"+local_branch.substr(2,local_branch.size()-2))))        //tant que le fichier n'existe pas sur le serveur
             {
                 to_add.push_back(local_branch);
+                cout << local_branch << endl;
                 local_branch = get_parent(repo,local_branch);
                 if(local_branch == "none"){throw(logic_error("Commits were made while you were away!"));}
             }
