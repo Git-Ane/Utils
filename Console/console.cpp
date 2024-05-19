@@ -8,6 +8,9 @@ using namespace std;
 #include "../Plugins/plugin_loader.hpp"
 
 #include <ostream>
+
+#include <filesystem>
+namespace fs = std::filesystem;
 namespace Color {
     enum Code {
         FG_RED      = 31,
@@ -113,14 +116,30 @@ namespace GitAne{
 
     }
 }
+std::string getHomeDirectory() {
+    const char *homeDir = getenv("HOME");
+    if (homeDir != nullptr) {
+        return std::string(homeDir);
+    } else {
+        // HOME environment variable not set, you may need to handle this case
+        return ""; // Alternatively, you could throw an exception or return a default directory
+    }
+}
 
 
 
 int main(int argc, char* argv[]) {
 
     unsigned int uargc = argc;
-
-
+    try{
+        if(!fs::exists(getHomeDirectory() + "/.config/gac")){
+            fs::create_directories(getHomeDirectory() +  "/.config/gac");
+        }
+        
+    }
+    catch(...){
+        std::cout << "[!] Can not create folder ~/.config/gac, please check that .config exists." << std::endl;
+    }
     initPlugin("std");
     addCommand("help",&std_helpmsg,"Help message about std plugin",0,0);
     addCommand("hello",&sayHello,"says hello :)",0,0); 

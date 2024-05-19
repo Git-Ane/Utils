@@ -13,7 +13,7 @@ class NetClient {
     public:
         string server_url;
         string token;
-        NetClient(string s,string e, string m, bool reg);
+        NetClient(string s,string e, string m, bool reg, bool skip);
         unordered_map<std::string, std::string> parseHTTPResponse(const std::string& httpResponse);
         unordered_map<std::string, std::string> body_to_args(const std::string& body);
         std::unordered_map<std::string, std::string> sendFile(string proj_name, string file_name, string file_content);

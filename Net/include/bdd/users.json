@@ -1,4 +1,8 @@
 {
+  "caca@caca.caca": {
+    "pwd": "prouti",
+    "tok": "49995e75dc007fc4433f954b47e91741152b1dc7"
+  },
   "ddd": "eee",
   "kaka@prout.com": {
     "pwd": "prout22",
@@ -11,6 +15,34 @@
   "kaka@prout.com3": {
     "pwd": "prout22",
     "tok": "cb548f1b78884730d5df6054ace3dbeb6bc50de3"
+  },
+  "pipi@caca.prout": {
+    "pwd": "pipi",
+    "tok": "0d9ff72ad162a145557b9244baeca8fc11ad084b"
+  },
+  "pp@p.com": {
+    "pwd": "caca",
+    "tok": "59840e957ebd9ac8c448add3e21983f2c597c323"
+  },
+  "prout@proutprout.com": {
+    "pwd": "caca",
+    "tok": "a4ea0201efe743fab035e932cce4bf2cdb549425"
+  },
+  "prouta@prouti.com": {
+    "pwd": "caca",
+    "tok": "2b91c14b0bcc1f4e93ecc7d8506be0d41cd5740a"
+  },
+  "prouti@prouta.com": {
+    "pwd": "prout2",
+    "tok": "74e008ce88db34c878b2404f29ed78827dd9d828"
+  },
+  "prouti@proutprout.prout": {
+    "pwd": "aka47",
+    "tok": "966924c3079a89db3547ea27db936812df429ff2"
+  },
+  "proutiprouta@prout.prout": {
+    "pwd": "prout2",
+    "tok": "045dda833cd91f194a7581c249ae7ebead73a14b"
   },
   "test@test.com": {
     "pwd": "testest",

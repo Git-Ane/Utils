@@ -11,9 +11,50 @@ string convert_filename(string filename){
     return s;
 }
 
+std::string getHomeDirectoryGitting() {
+            const char *homeDir = getenv("HOME");
+            if (homeDir != nullptr) {
+                return std::string(homeDir);
+            } else {
+                // HOME environment variable not set, you may need to handle this case
+                return ""; // Alternatively, you could throw an exception or return a default directory
+            }
+        }
+
+std::pair<std::string, std::string> url_and_token() {
+            std::ifstream infile2(getHomeDirectoryGitting() + "/.config/gac/act_serv");
+            std::string server_name;
+            if(std::getline(infile2, server_name))
+            {
+
+            
+            std::ifstream infile(getHomeDirectoryGitting() + "/.config/gac/server_list");
+            std::string line;
+            while (std::getline(infile, line)) {
+                std::istringstream iss(line);
+                std::string current_server_name;
+                if (std::getline(iss, current_server_name, '\0')) {
+                    if (current_server_name == server_name) {
+                        std::string url, token;
+                        if (std::getline(iss, url, '\0') && std::getline(iss, token, '\0')) {
+                            return std::make_pair(url, token);
+                        }
+                    }
+                }
+            }
+            // Return empty strings if server name not found
+            std::cout << "[!] act_server content does not correspond to any server in the list." << std::endl; 
+            return std::make_pair("", "");
+            }
+            else {
+                std::cout << "[!] act_server does not exists. Please do gac client connect server_name" << std::endl;
+                return std::make_pair("", "");
+            }
+        }
 
 void copy_to_server(string proj_name){
-    GitAne::NetClient cTest("localhost:8086","test@test.com","testest", false);
+    std::pair<std::string, std::string> p = url_and_token();
+    GitAne::NetClient cTest(p.first,"auto-registered-name",p.second, false,true);
     GitRepo repo = repo_find("");
     for (const auto& entry : fs::recursive_directory_iterator(repo.get_gitdir())){
         if(fs::is_regular_file(entry)){
@@ -31,7 +72,8 @@ void pull(string proj_name){
     if(made_changes(repo)){throw(logic_error("Commit your changes before you pull!"));}
     if((get_branches(repo)[get_active_branch(repo)]!=get_head(repo,true))){throw(logic_error("Can't pull in detached HEAD mode"));}
 
-    GitAne::NetClient cTest("localhost:8086","test@test.com","testest", false);
+    std::pair<std::string, std::string> p = url_and_token();
+    GitAne::NetClient cTest(p.first,"auto-registered-name",p.second, false,true);
     string active_branch = get_active_branch(repo);
     string local_branch = get_branches(repo)[active_branch];
     string branches = cTest.receiveFile(proj_name,convert_filename("branches"));
@@ -92,7 +134,8 @@ void push(string proj_name){
     if(made_changes(repo)){throw(logic_error("Commit your changes before you push!"));}
     if((get_branches(repo)[get_active_branch(repo)]!=get_head(repo,true))){throw(logic_error("Can't push in detached HEAD mode"));}
 
-    GitAne::NetClient cTest("localhost:8086","test@test.com","testest", false);
+    std::pair<std::string, std::string> p = url_and_token();
+    GitAne::NetClient cTest(p.first,"auto-registered-name",p.second, false,true);
     string active_branch = get_active_branch(repo);
     string local_branch = get_branches(repo)[active_branch];
     string new_remote_branch = get_branches(repo)[active_branch];

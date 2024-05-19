@@ -8,6 +8,7 @@
 #include <unordered_map>
 using namespace std;
 
+
 namespace GitAne{
 
         unordered_map<std::string, std::string> NetClient::parseHTTPResponse(const std::string& httpResponse) {
@@ -94,7 +95,14 @@ namespace GitAne{
 
             return args;
         }
-        NetClient::NetClient(string s,string e, string m, bool reg){
+        NetClient::NetClient(string s,string e, string m, bool reg, bool skip){
+            if(skip){
+                // skip mode is when we already have the token stored in local.
+                server_url = s;
+                email = e;
+                token = m;
+                return;
+            }
             server_url = s;
             email = e;
             token = "UNSET";

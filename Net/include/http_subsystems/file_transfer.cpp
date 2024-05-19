@@ -92,12 +92,10 @@ std::string buildSendFileResponse(std::string method, std::string args){
     std::ifstream f("./include/bdd/users.json");
     json data = json::parse(f);
     bool logged = false;
-    std::cout << "Commence à chercher le token " << token << std::endl;
     for (auto it = data.begin(); it != data.end(); ++it) {
         if(it->is_string()) continue;
         if(it.value()["tok"] == token){
             logged=true;
-            std::cout << "A trouvé !" << std::endl;
         }
         else{
             std::cout << "Le token testé est " << it.value()["tok"] << std::endl;
