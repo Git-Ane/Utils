@@ -13,7 +13,7 @@ using namespace GitAne;
 namespace GitAne{
 
     void create_dir(fs::path path){
-        if(fs::create_directory(path)){cout << "Directory " << path.string() << " created successfully !" << endl;}
+        if(fs::create_directory(path)){}
         else{throw invalid_argument(path.string() + " could not be created");}
     }
 
@@ -21,7 +21,6 @@ namespace GitAne{
         if (!fs::exists(path)) {
             ofstream outputFile(path);
             if (outputFile.is_open()) {
-                cout << "File " << path.string() << " created successfully !" << endl;
             }
             else {
                 std::cerr << "Failed to create file " << path.string() << endl;
@@ -95,6 +94,8 @@ namespace GitAne{
         conf << "# write what you want here, we will carefully ignore it.";
 
         conf.close();
+
+        cout << "A GitAne repositiory was created successfully!" << endl;
         
 
         return repo;
@@ -116,8 +117,6 @@ namespace GitAne{
         std::string ligne;
         while (std::getline(fichier, ligne)) {
             if (ligne == args[0]) {
-                // Le nom est déjà présent, donc nous n'avons rien à faire
-                std::cout << "File " << args[0] << " is already tracked" << std::endl;
                 return;
             }
         }
@@ -130,7 +129,6 @@ namespace GitAne{
         }
 
         fichier_sortie << args[0] << std::endl;
-        std::cout << args[0] << " tracked successfuly." << endl;
         return;
 
     }
@@ -170,12 +168,6 @@ namespace GitAne{
             }
         }
 
-        if (nomTrouve) {
-            std::cout << args[0] << " untracked successfuly." << endl;
-            return;
-        } else {
-            std::cout << "File " << args[0] << " is not tracked" << std::endl;
-        }
     }
 
     string get_hash_of_branch(string nom, bool ignore_temporary){
@@ -209,7 +201,7 @@ namespace GitAne{
         fs::path git_objects_folder = repo.get_gitdir() / "objects" / hash.substr(0, 2);
         if (fs::exists(git_objects_folder)) {
             if (fs::exists(git_objects_folder / hash.substr(2))) {
-                std::cout << "File did not changed.";
+                cout << "File did not change" << endl;
                 return hash;
             }
         } else {
@@ -375,7 +367,6 @@ namespace GitAne{
                 buffer << file.rdbuf(); // Read the entire file into the stringstream buffer
                 std::string content = buffer.str();
 
-                cout << "Read file " << element << " content was : "<< endl << content << endl;
 
                 GitBlob a_ajouter(content);
                 a_ajouter.deserialize(content); // si on le met pas ça met 0, faut vraiment utiliser full fonctions quand on utilise des réfs ...
@@ -441,7 +432,6 @@ namespace GitAne{
         tracks_file.close();
         vector<std::string> ignorePatterns = parseGitIgnore(".gacignore");
         ignorePatterns.push_back(".gac/*");
-        cout << "sha : " << sha << endl;
         string s;
         if(sha=="none"){
             s = "";
@@ -449,7 +439,6 @@ namespace GitAne{
         else{
             s = read_object(repo,sha);
         }
-        cout << "ok" << endl;
           
         unordered_map<string,string> k = kvlm_parse(s);
         set<string> still_exist;
@@ -462,14 +451,12 @@ namespace GitAne{
         }
         cout << "=== START CHECKOUT COMMIT " + name + " ===" <<endl;
         for (auto& it: k) {
-            cout << "File " << it.first << endl;
             if(it.first[0]!='#'){
+                cout << "File " << it.first << endl;
                 string s = read_object(repo,it.second);
                 fs::path dir_path = fs::path(it.first).parent_path();
                 if (!fs::exists(dir_path) && dir_path != "") {
-                    cout << "directory " << dir_path << endl;
                     fs::create_directories(dir_path);
-                    std::cout << "Directories created: " << dir_path << std::endl;
                 }
                 ofstream f(it.first);
                 f << s;
@@ -731,7 +718,6 @@ namespace GitAne{
             ret += "\n" + it->second + "\n";
         }
 
-        // cout<< "serialized klvm into :" << endl << ret <<endl;
 
         return ret;
     }
@@ -784,17 +770,14 @@ namespace GitAne{
 
 
     bool matchPattern(const std::string& filePath, const std::string& pattern) {
-        // Convert gitignore pattern to regex
         std::string regexPattern = std::regex_replace(pattern, std::regex("\\."), "\\.");
         regexPattern = std::regex_replace(regexPattern, std::regex("\\*"), ".*");
         regexPattern = std::regex_replace(regexPattern, std::regex("\\?"), ".");
         regexPattern = "^" + regexPattern + "$";
 
-        // Perform regex match
         return std::regex_match(filePath, std::regex(regexPattern));
     }
 
-    // Function to check if a file should be ignored according to gitignore rules
     bool shouldIgnoreFile(const std::string& filePath, const std::vector<std::string>& patterns) {
         for (const auto& pattern : patterns) {
             if (matchPattern(filePath, pattern)) {
@@ -804,7 +787,6 @@ namespace GitAne{
         return false;
     }
 
-    // Function to parse .gitignore file and store patterns in a vector
     std::vector<std::string> parseGitIgnore(const std::string& gitIgnorePath) {
         std::vector<std::string> patterns;
         std::ifstream file(gitIgnorePath);
