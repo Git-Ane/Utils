@@ -13,7 +13,7 @@ string convert_filename(string filename){
 
 
 void copy_to_server(string proj_name){
-    GitAne::NetClient cTest("localhost:8087","test@test.com","testest", false);
+    GitAne::NetClient cTest("localhost:8086","test@test.com","testest", false);
     GitRepo repo = repo_find("");
     for (const auto& entry : fs::recursive_directory_iterator(repo.get_gitdir())){
         if(fs::is_regular_file(entry)){
@@ -31,7 +31,7 @@ void pull(string proj_name){
     if(made_changes(repo)){throw(logic_error("Commit your changes before you pull!"));}
     if((get_branches(repo)[get_active_branch(repo)]!=get_head(repo,true))){throw(logic_error("Can't pull in detached HEAD mode"));}
 
-    GitAne::NetClient cTest("localhost:8087","test@test.com","testest", false);
+    GitAne::NetClient cTest("localhost:8086","test@test.com","testest", false);
     string active_branch = get_active_branch(repo);
     string local_branch = get_branches(repo)[active_branch];
     string branches = cTest.receiveFile(proj_name,convert_filename("branches"));
@@ -92,7 +92,7 @@ void push(string proj_name){
     if(made_changes(repo)){throw(logic_error("Commit your changes before you push!"));}
     if((get_branches(repo)[get_active_branch(repo)]!=get_head(repo,true))){throw(logic_error("Can't push in detached HEAD mode"));}
 
-    GitAne::NetClient cTest("localhost:8087","test@test.com","testest", false);
+    GitAne::NetClient cTest("localhost:8086","test@test.com","testest", false);
     string active_branch = get_active_branch(repo);
     string local_branch = get_branches(repo)[active_branch];
     string new_remote_branch = get_branches(repo)[active_branch];
