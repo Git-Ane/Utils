@@ -120,6 +120,8 @@ void pull(string proj_name){
     args.push_back(active_branch);
     checkoutcommit(args);
 
+    cout << "Pulled branch " << active_branch << endl;
+
 }
 
 
@@ -171,7 +173,7 @@ void push(string proj_name){
 
     k[active_branch] = new_remote_branch;
     cTest.sendFile(proj_name,"branches",kvlm_serialize(k));
-    cout << "Pulled branch " << active_branch << endl;
+    cout << "Pushed branch " << active_branch << endl;
     
 }
 
