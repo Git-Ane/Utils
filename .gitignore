@@ -24,3 +24,4 @@ build/GitAneConsole
 Net/build/*
 Net/client
 Net/bdd/*
+Net/test_client
