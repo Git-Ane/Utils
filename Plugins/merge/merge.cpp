@@ -25,7 +25,7 @@ namespace GitAne{
                 h = get_parent(r,h);
             }
             lca_hash = h;
-            cout << "Ancetre commun : " << lca_hash << endl;
+            cout << "LCA : " << lca_hash << endl;
             if(!fs::exists(r.get_gitdir() / "merge")){
                 create_dir(r.get_gitdir() / "merge");
             }
@@ -34,19 +34,19 @@ namespace GitAne{
                 return;
             }
             if (current_branch_hash == target_branch_hash) {
-                cout << "Les branches sont identiques. Aucune fusion nécessaire." << endl;
+                cout << "Branches are the same, no fusion is necessary" << endl;
                 return;
             }
 
             if (fs::exists(r.get_gitdir() / "merge"/ current_branch_hash)) {
-                cerr << "La branche actuelle est déjà en train de faire un merge. Utilisez merge abort pour recommencer." << endl;
+                cerr << "The active branch is already in a merge. Use 'gac merge abort' to start again" << endl;
                 return;
 
             }
             else {
                 ofstream f = create_file(r.get_gitdir() / "merge"/ current_branch_hash);
                 if (!f) {
-                    cerr << "Erreur lors de la création du fichier de verrouillage pour le merge." << endl;
+                    cerr << "The locking merge file could not be created" << endl;
                     return;
                 }
 
@@ -72,7 +72,7 @@ namespace GitAne{
 
                         string hash2 = target_files[current_file.first];
                         if(!fs::exists(r.get_gitdir() / "objects" / hash2.substr(0, 2) / hash2.substr(2))){
-                            cerr << "Le hash du fichier " << current_file.first << " n'est pas valide pour la branche cible." << endl;
+                            cerr << "The hash of the file " << current_file.first << " is not valid for the target branch" << endl;
                             return;
                         }
                         ifstream file_v_cible(r.get_gitdir() / "objects" / hash2.substr(0, 2) / hash2.substr(2));
@@ -84,12 +84,10 @@ namespace GitAne{
                         while (file_v_cible.get(c)) {
                             res += c;
                         }
-                        cout << "On veut ajouter " << res << "au fichier" << endl;
                         file_v_cible.close();
                         ofstream output_file(current_file.first, ios::app);
                         // Vérifier si le fichier est ouvert
                         if (output_file.is_open()) {
-                            cout << "On a ouvert " << current_file.first << endl; 
                             // Déplacer le curseur à la fin du fichier
                             output_file.seekp(0, ios::end);
 
@@ -99,7 +97,7 @@ namespace GitAne{
                             // Fermer le fichier
                             output_file.close();
                         } else {
-                            cerr << "Erreur lors de l'ouverture du fichier 'coucou' en mode écriture." << endl;
+                            cerr << "Error when opening file" << endl;
                         }
 
                         /*
@@ -109,12 +107,11 @@ namespace GitAne{
                         if (rename(current_file.first.c_str(), conflicted_filename.c_str()) != 0) {
                             cerr << "Erreur lors du renommage du fichier en conflit : " << current_file.first << endl;
                         } else {
-                            cout << "Le fichier en conflit " << current_file.first << " a été renommé en " << conflicted_filename << endl;
+                            cout << "The conflicting file " << current_file.first << " was renamed in " << conflicted_filename << endl;
                         }
                         conflicting_files.push_back(current_file.first);
                     }
                     else {
-                        cout << current_file.first << " existe dans la branche cible, mais il n'a pas été modifié." << endl;
                     }
                 }
             }
@@ -129,19 +126,18 @@ namespace GitAne{
             }
 
             if (!conflicting_files.empty()) {
-                cout << "Des conflits de fusion ont été détectés dans les fichiers suivants :" << endl;
+                cout << "Conflicts were found in the following files :" << endl;
                 for (const auto& file : conflicting_files) {
                     cout << file << endl;
                 }
             } else {
-                cout << "Aucun conflit de fusion détecté." << endl;
-                cout << "ON FAIT QUOI MTN ?" << endl;
+                cout << "No conflict was detected" << endl;
+                cout << "Use 'gac merge validate' to finish the merge" << endl;
             }
             return;
         }
 
     bool try_to_merge(string sha_a, string sha_b, string sha_lca, fs::path file_name){
-        cout << "trying to merge " << sha_a << " " << sha_b << " " << sha_lca << endl;
         if(sha_a == sha_b){return true;}
         if(sha_b == sha_lca){return true;}
         if(sha_a == sha_lca){
@@ -177,11 +173,6 @@ namespace GitAne{
             getline(lock_file, target_branch_hash_locked);
         }
 
-        /*if (target_branch_hash_locked != target_branch_hash) {
-            cerr << "La branche cible a été modifiée depuis le début du merge. Veuillez utliser merge abort puis recommencer.\n Il s'agit d'une sécurité pour éviter que vous mergiez (et donc perdiez) du travail qui soit supprimé au prochain commit de vos collègues." << endl;
-            return;
-        }*/
-        //pour moi ça sert à rien psq la branche est de tt façon pas supprimée
 
         // Vérifier si tous les fichiers en conflit ont été résolus
         vector<string> conflicting_files;
@@ -194,7 +185,7 @@ namespace GitAne{
         }
 
         if (!conflicting_files.empty()) {
-            cout << "Des fichiers en conflit subsistent. Résolvez-les avant de finaliser la fusion." << endl;
+            cout << "Conflicting files exist, resolve them before merging" << endl;
             for (const auto& file : conflicting_files) {
                 cout << file << endl;
             }
@@ -206,7 +197,7 @@ namespace GitAne{
         
         write_commit("merge_commit",false, target_branch_hash, false);
 
-        cout << "La fusion des branches AURAIT été effectuée avec succès. Mais il faut qu'on voit à deux pour qu'on soit d'accord." << endl;
+        cout << "The merge of branches was done successfully!" << endl;
         return;
     }
 
