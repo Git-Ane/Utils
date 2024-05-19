@@ -109,7 +109,9 @@ namespace GitAne{
                 cout << "Réponse du serveur:\n" << "Code d'erreur: " << resRegister["error_code"] << "\nTaille: " << resRegister["content_length"] << "\n Message: " << resRegister["response_body"] << endl;
                 if(resRegister["error_code"] == "200"){
                     cout << "[*] Successfully registered." << endl;
-                    token ="OK";
+                    auto map = body_to_args(resRegister["response_body"]);
+                    token = map["Token"];
+                    std::cout << "Token defined as " << token << std::endl;
                 }
                 else{
                     cout << "[!] Can not register." << endl;
@@ -122,7 +124,9 @@ namespace GitAne{
                 cout << "Réponse du serveur:\n" << "Code d'erreur: " << resLogin["error_code"] << "\nTaille: " << resLogin["content_length"] << endl;
                 if(resLogin["error_code"] == "200"){
                     cout << "[*] Successfuly connected." << endl;
-                    token = "OK";
+                    auto map = body_to_args(resLogin["response_body"]);
+                    token = map["Token"];
+                    std::cout << "Token defined as " << token << std::endl;
                 }
                 else {cout << " [!] Failed to connect.";}
             }
