@@ -3,6 +3,7 @@
 #include "merge/merge.hpp"
 #include "date/date.hpp"
 #include "client/client.hpp"
+#include "print/print.hpp"
 #include "../Console/commands.hpp"
 #include <iostream>
 #include <fstream>
