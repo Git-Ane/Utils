@@ -29,7 +29,7 @@ std::string buildLoginResponse(std::string method, std::string args){
         if(data.find(username) == data.end()) return buildUnauthorizedRequestPage("Login","username unknown.");
         else{
             std::string token = data[username]["tok"];
-            if( data[username]["pwd"] == pwd) return buildOkPage("Login","Token: " + token);
+            if( data[username]["pwd"] == pwd) return buildOkPage("Login","Token:" + token);
             else return buildUnauthorizedRequestPage("Login","wrong password.");    
         }
 
@@ -65,7 +65,7 @@ std::string buildLoginResponse(std::string method, std::string args){
             std::ofstream outputFile("./include/bdd/users.json");
             outputFile << data.dump(2);  // dump(2) pour une mise en forme lisible
             outputFile.close();
-            return buildOkPage("Register","User created. Token: " + token);
+            return buildOkPage("Register","Token:" + token);
         }
         
 
