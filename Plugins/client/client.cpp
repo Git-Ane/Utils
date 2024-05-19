@@ -15,12 +15,6 @@ namespace GitAne{
                 return ""; // Alternatively, you could throw an exception or return a default directory
             }
         }
-        //GitAne::NetClient cTest("localhost:8087","test@test.com","testest");
-        void log_fun(vector<string> args){
-            GitAne::NetClient cTest(args[0],args[1],args[2],false,false);
-            cout << "ok" << endl;
-            cTest.sendFile("caca","caca.txt","je suis un gros caca");
-        }
 
         void copy_to_server_fun(vector<string> args){
             copy_to_server(args[0]);
@@ -155,7 +149,6 @@ namespace GitAne{
             addCommand("remove", &remove_server, "Remove a server from your server list, using his name on your computer.", 1, 1);
             addCommand("connect",&connect, "Set the server passed as an argument to be the server you are working on.",1,1);
             addCommand("server_list", &list_server, "List all your servers.", 0,0);
-            addCommand("log",&log_fun, "log to server",3,3);
             addCommand("cts",&copy_to_server_fun, "copy current git to server",1,1);
             addCommand("push",&push_fun, "push",1,1);
             addCommand("pull",&pull_fun, "pull",1,1);
