@@ -8,6 +8,7 @@ namespace GitAne{
         Debug::debug_plugin_loader();
         Merge::merge_plugin_loader();
         Client::client_plugin_loader();
+        Date::date_loader();
     }
 
 }

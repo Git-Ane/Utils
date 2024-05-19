@@ -9,8 +9,6 @@ using namespace std;
 namespace GitAne{
 
     namespace Joke{
-        void jonhatan(vector<string>);
-        void chinese(vector<string>);
 
         void joke_plugin_loader();
     }

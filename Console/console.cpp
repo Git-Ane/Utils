@@ -109,10 +109,7 @@ namespace GitAne{
             clean();
         }
 
-        unordered_map<string,string> test_commit_fun(unordered_map<string,string> k){
-            cout << "ça marche !!!" << endl;
-            return k;
-        }
+        
 
     }
 }
@@ -138,8 +135,6 @@ int main(int argc, char* argv[]) {
     addCommand("delete_branch",&delete_branch_fun,"delete branch arg1",1,1);
     addCommand("clean",&clean_fun,"clean useless files",0,0);
     plugin_loader();
-
-    addCommitFun(test_commit_fun);      //exemple, a remplacer dans un plugin et par un truc pertinent
 
 
     unsigned int i; 
