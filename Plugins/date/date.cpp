@@ -8,7 +8,7 @@ namespace GitAne{
         string get_date(){
             std::time_t t = std::time(nullptr);
             std::tm* now = std::localtime(&t);
-            return to_string(now->tm_year)+"-"+to_string(now->tm_mon)+"-"+to_string(now->tm_mday)+"__"+to_string(now->tm_hour)+":"+to_string(now->tm_min)+":"+to_string(now->tm_sec);
+            return to_string(now->tm_year+1900)+"-"+to_string(now->tm_mon+1)+"-"+to_string(now->tm_mday)+"__"+to_string(now->tm_hour)+":"+to_string(now->tm_min)+":"+to_string(now->tm_sec);
         }
 
         unordered_map<string,string> add_date_to_commit(unordered_map<string,string> k){

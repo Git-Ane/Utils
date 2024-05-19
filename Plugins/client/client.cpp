@@ -149,9 +149,9 @@ namespace GitAne{
             addCommand("remove", &remove_server, "Remove a server from your server list, using his name on your computer.", 1, 1);
             addCommand("connect",&connect, "Set the server passed as an argument to be the server you are working on.",1,1);
             addCommand("server_list", &list_server, "List all your servers.", 0,0);
-            addCommand("cts",&copy_to_server_fun, "copy current git to server",1,1);
-            addCommand("push",&push_fun, "push",1,1);
-            addCommand("pull",&pull_fun, "pull",1,1);
+            addCommand("cts",&copy_to_server_fun, "copy current git to server as project arg1",1,1);
+            addCommand("push",&push_fun, "push the current branch to project arg1",1,1);
+            addCommand("pull",&pull_fun, "pull the current branch to project arg1",1,1);
             
         }
     }
