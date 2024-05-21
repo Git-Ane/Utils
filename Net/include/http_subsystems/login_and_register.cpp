@@ -22,7 +22,7 @@ std::string buildLoginResponse(std::string method, std::string args){
             return buildBadRequestPage("Login","missing arguments, need <em>name</em> and <em>pwd</em>");
         }
         std::string username= maps["name"];
-        std::string pwd = maps["pwd"];
+        std::string pwd = sha1(maps["pwd"]);
         std::ifstream f("./include/bdd/users.json");
         json data = json::parse(f);
         f.close();
@@ -48,7 +48,7 @@ std::string buildLoginResponse(std::string method, std::string args){
             return buildBadRequestPage("Register","missing arguments, need <em>name</em> and <em>pwd</em>");
         }
         std::string username= maps["name"];
-        std::string pwd = maps["pwd"];
+        std::string pwd = sha1(maps["pwd"]);
         std::ifstream f("./include/bdd/users.json");
         json data = json::parse(f);
         f.close();
