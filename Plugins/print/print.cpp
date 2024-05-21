@@ -16,7 +16,7 @@ namespace GitAne{
             cout << endl;
             cout << "Metadata :" << endl;
             for (auto it : k){
-                if(it.first[0] == '#' && it.first != "#parent" && it.first != "#name" && it.first != "#second_parent"){
+                if(it.first[0] == '#' && it.first != "#parent" && it.first != "#name" && it.first != "#second_parent" && it.first != "#temporary"){
                     cout << it.first.substr(1,it.first.size()-1) << " : " << it.second << endl;
                 }
             }

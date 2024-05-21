@@ -1,4 +1,16 @@
-Utilities List:
-- Net, the backend & frontend of GitAne, necessary.
-- Console, the console that allows you to write things like `gac command` in your terminal (GitAneConsole). Also necessary.
-- SHA-warma, our SHA, needed as all our algorithms depends of it. (ouais ouais c notre sha à nous qu'on a fait tkt)
+Gitane installation :
+    - make dans le dossier général (pour build le git local)
+    - make dans le dossier Net (pout build le serveur)
+    - executer le fichier setup_gitane.sh pour installer le raccourci
+    - ecrire gac dans la console, la liste des commandes devraient s'afficher !
+    - pour lancer le serveur en local, éxécuter le fichier Net/build/GitAneServer
+
+
+Quelques commandes utiles :
+    - gac std init : inits a new GitAne repository
+    - gac std commit name : makes a commit of name name
+    - gac std checkout pos : checkout to the position pos
+    - gac client cts proj : copies the GitAne repository to the projet proj on the remote repository
+
+
+
