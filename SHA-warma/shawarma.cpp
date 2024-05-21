@@ -1,15 +1,5 @@
 #include "shawarma.hpp"
 namespace GitAne{
-    /*
-    IDEE:
-    Si on veut hasher CACA et que c'est:
-    CACA
-        /prout
-        /PIPI
-            /urinoire
-    On le voit comme un arbre et on stocke pour chacun
-    son hash et on en déduit celui de son père.
-    */
     double hashing_file(std::string path, std::string content){
         return 0.; // now in class.cpp because fuck off
     }

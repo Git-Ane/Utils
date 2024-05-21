@@ -18,7 +18,7 @@ namespace GitAne{
 
         void write_file(vector<string> args){
             GitRepo repo = repo_find("");
-            GitBlob blob("prout"); // Create a GitBlob object with content "prout"
+            GitBlob blob(""); // Create a GitBlob object with content ""
             std::cout << "La je set le fmt à " << blob.fmt << std::endl; 
             ifstream file(args[0]);
             std::stringstream buffer;
