@@ -1,10 +1,10 @@
-# Spécifiez le compilateur
+# Spécifier le compilateur
 CC=g++
 
-# Spécifiez les options de compilation
+# Spécifier les options de compilation
 CFLAGS=-std=c++17 -Wall -Iinclude
 
-# Nom de votre exécutable
+# Nom de l' exécutable
 TARGET=build/GitAneConsole
 
 # Chemins des fichiers source

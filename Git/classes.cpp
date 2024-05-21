@@ -208,7 +208,7 @@ namespace GitAne{
             create_dir(git_objects_folder);
         }
         ofstream f = create_file(git_objects_folder / hash.substr(2));
-        f << content; // Write the data to file
+        f << content; 
         f.close();
         return hash;
     }
@@ -690,14 +690,11 @@ namespace GitAne{
 
     string kvlm_serialize(const unordered_map<string, string>& kvlm) {
         string ret = "";
-        // Output fields
         for (const auto& pair : kvlm) {
-            // Skip the message itself
             if (pair.first == "") continue;
 
-            // Normalize to a list
             vector<string> val;
-            string valCopy = pair.second; // Make a copy to allow modification
+            string valCopy = pair.second; 
             if (valCopy.find("\n") != string::npos) {
                 size_t pos = 0;
                 while ((pos = valCopy.find("\n", pos)) != string::npos) {

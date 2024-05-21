@@ -11,8 +11,8 @@ namespace GitAne{
             if (homeDir != nullptr) {
                 return std::string(homeDir);
             } else {
-                // HOME environment variable not set, you may need to handle this case
-                return ""; // Alternatively, you could throw an exception or return a default directory
+                
+                return "";
             }
         }
 
@@ -49,7 +49,6 @@ namespace GitAne{
                     }
                 }
             }
-            // Return empty strings if server name not found
             std::cout << "[!] act_server content does not correspond to any server in the list." << std::endl; 
             return std::make_pair("", "");
             }
