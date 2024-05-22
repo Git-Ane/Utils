@@ -3,7 +3,7 @@ Gitane installation :
     - make dans le dossier Net (pout build le serveur)
     - executer le fichier setup_gitane.sh pour installer le raccourci
     - ecrire gac dans la console, la liste des commandes devraient s'afficher !
-    - pour lancer le serveur en local, éxécuter le fichier Net/build/GitAneServer
+    - pour lancer le serveur en local, lancer make run dans le dossier Net
 
 
 Quelques commandes utiles :

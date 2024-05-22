@@ -29,5 +29,8 @@ $(TARGET): $(OBJ)
 build/%.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@ -lssl -lcrypto -lz -lstdc++ -lcurl
 
+run: all
+	 ./build/GitAneServer
+
 clean:
 	rm -rf build
