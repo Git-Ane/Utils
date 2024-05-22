@@ -103,6 +103,7 @@ namespace GitAne{
                 token = m;
                 return;
             }
+            m = Net::sha1(m);
             server_url = s;
             email = e;
             token = "UNSET";
