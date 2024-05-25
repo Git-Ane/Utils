@@ -19,8 +19,7 @@ $(shell mkdir -p build/include)
 $(shell mkdir -p build/include/http_subsystems)
 $(shell mkdir -p build/include/http_subsystems)
 $(shell g++ client.cpp -std=c++17 -c -o client.o -lssl -lcrypto -lz -lstdc++ -lcurl)
-$(shell g++ test_client.cpp -std=c++17 -c -o test_client.o -lssl -lcrypto -lz -lstdc++ -lcurl)
-$(shell g++ test_client.o client.o ./build/include/http_subsystems/data_manipulations.o -std=c++17 -lssl -lcrypto -lz -lstdc++ -lcurl -o test_client)
+
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
@@ -34,3 +33,6 @@ run: all
 
 clean:
 	rm -rf build
+
+$(shell g++ test_client.cpp -std=c++17 -c -o test_client.o -lssl -lcrypto -lz -lstdc++ -lcurl)
+$(shell g++ test_client.o client.o ./build/include/http_subsystems/data_manipulations.o -std=c++17 -lssl -lcrypto -lz -lstdc++ -lcurl -o test_client)

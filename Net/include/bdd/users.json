@@ -1,1 +1,14 @@
-{}
+{
+  "foo@bar.test": {
+    "pwd": "4242",
+    "tok": "a2f22ccfdf3846919eb517bee9579dc7422cc1dd"
+  },
+  "prout@proutprout.com": {
+    "pwd": "papa",
+    "tok": "51ffa2135591000b11b63d4d4540d53eca13b5bf"
+  },
+  "test@test.com": {
+    "pwd": "c4033bff94b567a190e33faa551f411caef444f2",
+    "tok": "5f0aedfcd1021e8a1bbe5bdc9fe492d99237575a"
+  }
+}
